@@ -34,6 +34,7 @@ import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.command.PushImageCmd;
 import com.github.dockerjava.api.command.RemoveContainerCmd;
 import com.github.dockerjava.api.command.RemoveImageCmd;
+import com.github.dockerjava.api.command.ResizeContainerCmd;
 import com.github.dockerjava.api.command.RestartContainerCmd;
 import com.github.dockerjava.api.command.SaveImageCmd;
 import com.github.dockerjava.api.command.SearchImagesCmd;
@@ -255,6 +256,11 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
     @Override
     public KillContainerCmd.Exec createKillContainerCmdExec() {
         return delegate.createKillContainerCmdExec();
+    }
+
+    @Override
+    public ResizeContainerCmd.Exec createResizeContainerCmdExec() {
+        return delegate.createResizeContainerCmdExec();
     }
 
     @Override

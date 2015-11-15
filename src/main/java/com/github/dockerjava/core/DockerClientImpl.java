@@ -27,6 +27,7 @@ import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.command.PushImageCmd;
 import com.github.dockerjava.api.command.RemoveContainerCmd;
 import com.github.dockerjava.api.command.RemoveImageCmd;
+import com.github.dockerjava.api.command.ResizeContainerCmd;
 import com.github.dockerjava.api.command.RestartContainerCmd;
 import com.github.dockerjava.api.command.SaveImageCmd;
 import com.github.dockerjava.api.command.SearchImagesCmd;
@@ -65,6 +66,7 @@ import com.github.dockerjava.core.command.PullImageCmdImpl;
 import com.github.dockerjava.core.command.PushImageCmdImpl;
 import com.github.dockerjava.core.command.RemoveContainerCmdImpl;
 import com.github.dockerjava.core.command.RemoveImageCmdImpl;
+import com.github.dockerjava.core.command.ResizeContainerCmdImpl;
 import com.github.dockerjava.core.command.RestartContainerCmdImpl;
 import com.github.dockerjava.core.command.SaveImageCmdImpl;
 import com.github.dockerjava.core.command.SearchImagesCmdImpl;
@@ -261,6 +263,11 @@ public class DockerClientImpl implements Closeable, DockerClient {
     @Override
     public InspectContainerCmd inspectContainerCmd(String containerId) {
         return new InspectContainerCmdImpl(getDockerCmdExecFactory().createInspectContainerCmdExec(), containerId);
+    }
+
+    @Override
+    public ResizeContainerCmd resizeContainerCmd(String containerId, String height, String width) {
+        return new ResizeContainerCmdImpl(getDockerCmdExecFactory().createResizeContainerCmdExec(), containerId, height, width);
     }
 
     @Override
