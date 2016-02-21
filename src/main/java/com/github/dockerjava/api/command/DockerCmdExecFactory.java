@@ -3,6 +3,8 @@ package com.github.dockerjava.api.command;
 import java.io.Closeable;
 import java.io.IOException;
 
+import javax.net.ssl.SSLContext;
+
 import com.github.dockerjava.core.DockerClientConfig;
 
 public interface DockerCmdExecFactory extends Closeable {
@@ -59,6 +61,10 @@ public interface DockerCmdExecFactory extends Closeable {
 
     public ResizeContainerCmd.Exec createResizeContainerCmdExec();
 
+    public CopyArchiveFromContainerCmd.Exec createCopyArchiveFromContainerCmdExec();
+
+    public CopyArchiveToContainerCmd.Exec createCopyArchiveToContainerCmdExec();
+
     public StopContainerCmd.Exec createStopContainerCmdExec();
 
     public ContainerDiffCmd.Exec createContainerDiffCmdExec();
@@ -82,6 +88,28 @@ public interface DockerCmdExecFactory extends Closeable {
     public EventsCmd.Exec createEventsCmdExec();
 
     public StatsCmd.Exec createStatsCmdExec();
+
+    public CreateVolumeCmd.Exec createCreateVolumeCmdExec();
+
+    public InspectVolumeCmd.Exec createInspectVolumeCmdExec();
+
+    public RemoveVolumeCmd.Exec createRemoveVolumeCmdExec();
+
+    public ListVolumesCmd.Exec createListVolumesCmdExec();
+
+    public ListNetworksCmd.Exec createListNetworksCmdExec();
+
+    public InspectNetworkCmd.Exec createInspectNetworkCmdExec();
+
+    public CreateNetworkCmd.Exec createCreateNetworkCmdExec();
+
+    public RemoveNetworkCmd.Exec createRemoveNetworkCmdExec();
+
+    public ConnectToNetworkCmd.Exec createConnectToNetworkCmdExec();
+
+    public DisconnectFromNetworkCmd.Exec createDisconnectFromNetworkCmdExec();
+
+    public DockerCmdExecFactory withSSLContext(SSLContext sslContext);
 
     @Override
     public void close() throws IOException;

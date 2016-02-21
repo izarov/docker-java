@@ -20,8 +20,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.github.dockerjava.api.DockerException;
-import com.github.dockerjava.api.NotFoundException;
+import com.github.dockerjava.api.exception.DockerException;
+import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.client.AbstractDockerClientTest;
@@ -63,7 +63,6 @@ public class RemoveImageCmdImplTest extends AbstractDockerClientTest {
         String imageId = dockerClient.commitCmd(container.getId()).exec();
 
         dockerClient.stopContainerCmd(container.getId()).exec();
-        dockerClient.killContainerCmd(container.getId()).exec();
         dockerClient.removeContainerCmd(container.getId()).exec();
 
         LOG.info("Removing image: {}", imageId);

@@ -1,14 +1,27 @@
 package com.github.dockerjava.core;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.AttachContainerCmd;
 import com.github.dockerjava.api.command.AuthCmd;
 import com.github.dockerjava.api.command.BuildImageCmd;
 import com.github.dockerjava.api.command.CommitCmd;
+import com.github.dockerjava.api.command.ConnectToNetworkCmd;
 import com.github.dockerjava.api.command.ContainerDiffCmd;
+import com.github.dockerjava.api.command.CopyArchiveFromContainerCmd;
+import com.github.dockerjava.api.command.CopyArchiveToContainerCmd;
 import com.github.dockerjava.api.command.CopyFileFromContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateImageCmd;
+import com.github.dockerjava.api.command.CreateNetworkCmd;
+import com.github.dockerjava.api.command.CreateVolumeCmd;
+import com.github.dockerjava.api.command.DisconnectFromNetworkCmd;
 import com.github.dockerjava.api.command.DockerCmdExecFactory;
 import com.github.dockerjava.api.command.EventsCmd;
 import com.github.dockerjava.api.command.ExecCreateCmd;
@@ -17,9 +30,13 @@ import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.api.command.InspectContainerCmd;
 import com.github.dockerjava.api.command.InspectExecCmd;
 import com.github.dockerjava.api.command.InspectImageCmd;
+import com.github.dockerjava.api.command.InspectNetworkCmd;
+import com.github.dockerjava.api.command.InspectVolumeCmd;
 import com.github.dockerjava.api.command.KillContainerCmd;
 import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.command.ListImagesCmd;
+import com.github.dockerjava.api.command.ListNetworksCmd;
+import com.github.dockerjava.api.command.ListVolumesCmd;
 import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.command.PauseContainerCmd;
 import com.github.dockerjava.api.command.PingCmd;
@@ -28,6 +45,8 @@ import com.github.dockerjava.api.command.PushImageCmd;
 import com.github.dockerjava.api.command.RemoveContainerCmd;
 import com.github.dockerjava.api.command.RemoveImageCmd;
 import com.github.dockerjava.api.command.ResizeContainerCmd;
+import com.github.dockerjava.api.command.RemoveNetworkCmd;
+import com.github.dockerjava.api.command.RemoveVolumeCmd;
 import com.github.dockerjava.api.command.RestartContainerCmd;
 import com.github.dockerjava.api.command.SaveImageCmd;
 import com.github.dockerjava.api.command.SearchImagesCmd;
@@ -45,20 +64,30 @@ import com.github.dockerjava.core.command.AttachContainerCmdImpl;
 import com.github.dockerjava.core.command.AuthCmdImpl;
 import com.github.dockerjava.core.command.BuildImageCmdImpl;
 import com.github.dockerjava.core.command.CommitCmdImpl;
+import com.github.dockerjava.core.command.ConnectToNetworkCmdImpl;
 import com.github.dockerjava.core.command.ContainerDiffCmdImpl;
+import com.github.dockerjava.core.command.CopyArchiveFromContainerCmdImpl;
+import com.github.dockerjava.core.command.CopyArchiveToContainerCmdImpl;
 import com.github.dockerjava.core.command.CopyFileFromContainerCmdImpl;
 import com.github.dockerjava.core.command.CreateContainerCmdImpl;
 import com.github.dockerjava.core.command.CreateImageCmdImpl;
+import com.github.dockerjava.core.command.CreateNetworkCmdImpl;
+import com.github.dockerjava.core.command.CreateVolumeCmdImpl;
+import com.github.dockerjava.core.command.DisconnectFromNetworkCmdImpl;
 import com.github.dockerjava.core.command.EventsCmdImpl;
 import com.github.dockerjava.core.command.ExecCreateCmdImpl;
 import com.github.dockerjava.core.command.ExecStartCmdImpl;
 import com.github.dockerjava.core.command.InfoCmdImpl;
+import com.github.dockerjava.core.command.InpectNetworkCmdImpl;
 import com.github.dockerjava.core.command.InspectContainerCmdImpl;
 import com.github.dockerjava.core.command.InspectExecCmdImpl;
 import com.github.dockerjava.core.command.InspectImageCmdImpl;
+import com.github.dockerjava.core.command.InspectVolumeCmdImpl;
 import com.github.dockerjava.core.command.KillContainerCmdImpl;
 import com.github.dockerjava.core.command.ListContainersCmdImpl;
 import com.github.dockerjava.core.command.ListImagesCmdImpl;
+import com.github.dockerjava.core.command.ListNetworksCmdImpl;
+import com.github.dockerjava.core.command.ListVolumesCmdImpl;
 import com.github.dockerjava.core.command.LogContainerCmdImpl;
 import com.github.dockerjava.core.command.PauseContainerCmdImpl;
 import com.github.dockerjava.core.command.PingCmdImpl;
@@ -67,6 +96,8 @@ import com.github.dockerjava.core.command.PushImageCmdImpl;
 import com.github.dockerjava.core.command.RemoveContainerCmdImpl;
 import com.github.dockerjava.core.command.RemoveImageCmdImpl;
 import com.github.dockerjava.core.command.ResizeContainerCmdImpl;
+import com.github.dockerjava.core.command.RemoveNetworkCmdImpl;
+import com.github.dockerjava.core.command.RemoveVolumeCmdImpl;
 import com.github.dockerjava.core.command.RestartContainerCmdImpl;
 import com.github.dockerjava.core.command.SaveImageCmdImpl;
 import com.github.dockerjava.core.command.SearchImagesCmdImpl;
@@ -79,16 +110,8 @@ import com.github.dockerjava.core.command.UnpauseContainerCmdImpl;
 import com.github.dockerjava.core.command.VersionCmdImpl;
 import com.github.dockerjava.core.command.WaitContainerCmdImpl;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * @author Konstantin Pelykh (kpelykh@gmail.com)
- *
  * @see "https://github.com/docker/docker/blob/master/api/client/commands.go"
  */
 public class DockerClientImpl implements Closeable, DockerClient {
@@ -111,7 +134,7 @@ public class DockerClientImpl implements Closeable, DockerClient {
     }
 
     private static DockerClientConfig configWithServerUrl(String serverUrl) {
-        return DockerClientConfig.createDefaultConfigBuilder().withUri(serverUrl).build();
+        return DockerClientConfig.createDefaultConfigBuilder().withDockerHost(serverUrl).build();
     }
 
     public static DockerClientImpl getInstance() {
@@ -140,16 +163,14 @@ public class DockerClientImpl implements Closeable, DockerClient {
 
     @Override
     public AuthConfig authConfig() {
-        checkNotNull(dockerClientConfig.getUsername(), "Configured username is null.");
-        checkNotNull(dockerClientConfig.getServerAddress(), "Configured serverAddress is null.");
+        checkNotNull(dockerClientConfig.getRegistryUsername(), "Configured username is null.");
+        checkNotNull(dockerClientConfig.getRegistryUrl(), "Configured serverAddress is null.");
 
-        AuthConfig authConfig = new AuthConfig();
-        authConfig.setUsername(dockerClientConfig.getUsername());
-        authConfig.setPassword(dockerClientConfig.getPassword());
-        authConfig.setEmail(dockerClientConfig.getEmail());
-        authConfig.setServerAddress(dockerClientConfig.getServerAddress());
-
-        return authConfig;
+        return new AuthConfig()
+                .withUsername(dockerClientConfig.getRegistryUsername())
+                .withPassword(dockerClientConfig.getRegistryPassword())
+                .withEmail(dockerClientConfig.getRegistryEmail())
+                .withRegistryAddress(dockerClientConfig.getRegistryUrl());
     }
 
     /**
@@ -193,20 +214,23 @@ public class DockerClientImpl implements Closeable, DockerClient {
         PushImageCmd cmd = new PushImageCmdImpl(getDockerCmdExecFactory().createPushImageCmdExec(), name);
 
         AuthConfig cfg = dockerClientConfig.effectiveAuthConfig(name);
-        if (cfg != null)
+        if (cfg != null) {
             cmd.withAuthConfig(cfg);
+        }
         return cmd;
     }
 
     @Override
     public PushImageCmd pushImageCmd(Identifier identifier) {
         PushImageCmd cmd = pushImageCmd(identifier.repository.name);
-        if (identifier.tag.isPresent())
+        if (identifier.tag.isPresent()) {
             cmd.withTag(identifier.tag.get());
+        }
 
         AuthConfig cfg = dockerClientConfig.effectiveAuthConfig(identifier.repository.name);
-        if (cfg != null)
+        if (cfg != null) {
             cmd.withAuthConfig(cfg);
+        }
 
         return cmd;
     }
@@ -312,6 +336,18 @@ public class DockerClientImpl implements Closeable, DockerClient {
     }
 
     @Override
+    public CopyArchiveFromContainerCmd copyArchiveFromContainerCmd(String containerId, String resource) {
+        return new CopyArchiveFromContainerCmdImpl(getDockerCmdExecFactory().createCopyArchiveFromContainerCmdExec(),
+                containerId, resource);
+    }
+
+    @Override
+    public CopyArchiveToContainerCmd copyArchiveToContainerCmd(String containerId) {
+        return new CopyArchiveToContainerCmdImpl(getDockerCmdExecFactory().createCopyArchiveToContainerCmdExec(),
+                containerId);
+    }
+
+    @Override
     public ContainerDiffCmd containerDiffCmd(String containerId) {
         return new ContainerDiffCmdImpl(getDockerCmdExecFactory().createContainerDiffCmdExec(), containerId);
     }
@@ -377,8 +413,58 @@ public class DockerClientImpl implements Closeable, DockerClient {
     }
 
     @Override
-    public StatsCmd statsCmd() {
-        return new StatsCmdImpl(getDockerCmdExecFactory().createStatsCmdExec());
+    public StatsCmd statsCmd(String containerId) {
+        return new StatsCmdImpl(getDockerCmdExecFactory().createStatsCmdExec(), containerId);
+    }
+
+    @Override
+    public CreateVolumeCmd createVolumeCmd() {
+        return new CreateVolumeCmdImpl(getDockerCmdExecFactory().createCreateVolumeCmdExec());
+    }
+
+    @Override
+    public InspectVolumeCmd inspectVolumeCmd(String name) {
+        return new InspectVolumeCmdImpl(getDockerCmdExecFactory().createInspectVolumeCmdExec(), name);
+    }
+
+    @Override
+    public RemoveVolumeCmd removeVolumeCmd(String name) {
+        return new RemoveVolumeCmdImpl(getDockerCmdExecFactory().createRemoveVolumeCmdExec(), name);
+    }
+
+    @Override
+    public ListVolumesCmd listVolumesCmd() {
+        return new ListVolumesCmdImpl(getDockerCmdExecFactory().createListVolumesCmdExec());
+    }
+
+    @Override
+    public ListNetworksCmd listNetworksCmd() {
+        return new ListNetworksCmdImpl(getDockerCmdExecFactory().createListNetworksCmdExec());
+    }
+
+    @Override
+    public InspectNetworkCmd inspectNetworkCmd() {
+        return new InpectNetworkCmdImpl(getDockerCmdExecFactory().createInspectNetworkCmdExec());
+    }
+
+    @Override
+    public CreateNetworkCmd createNetworkCmd() {
+        return new CreateNetworkCmdImpl(getDockerCmdExecFactory().createCreateNetworkCmdExec());
+    }
+
+    @Override
+    public RemoveNetworkCmd removeNetworkCmd(String networkId) {
+        return new RemoveNetworkCmdImpl(getDockerCmdExecFactory().createRemoveNetworkCmdExec(), networkId);
+    }
+
+    @Override
+    public ConnectToNetworkCmd connectToNetworkCmd() {
+        return new ConnectToNetworkCmdImpl(getDockerCmdExecFactory().createConnectToNetworkCmdExec());
+    }
+
+    @Override
+    public DisconnectFromNetworkCmd disconnectFromNetworkCmd() {
+        return new DisconnectFromNetworkCmdImpl(getDockerCmdExecFactory().createDisconnectFromNetworkCmdExec());
     }
 
     @Override

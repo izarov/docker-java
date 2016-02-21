@@ -10,19 +10,18 @@ import javax.annotation.CheckForNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.dockerjava.api.DockerClientException;
+import com.github.dockerjava.api.exception.DockerClientException;
 import com.github.dockerjava.api.model.WaitResponse;
 import com.github.dockerjava.core.async.ResultCallbackTemplate;
-import com.google.common.base.Throwables;
 
 /**
  *
- * @author marcus
+ * @author Marcus Linke
  *
  */
 public class WaitContainerResultCallback extends ResultCallbackTemplate<WaitContainerResultCallback, WaitResponse> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(WaitContainerResultCallback.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WaitContainerResultCallback.class);
 
     @CheckForNull
     private WaitResponse waitResponse = null;

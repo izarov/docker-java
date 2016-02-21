@@ -4,14 +4,29 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.InputStream;
 
-import com.github.dockerjava.api.NotFoundException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.ExecStartCmd;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.Frame;
 
-public class ExecStartCmdImpl extends AbstrDockerCmd<ExecStartCmd, InputStream> implements ExecStartCmd {
+@JsonInclude(Include.NON_NULL)
+public class ExecStartCmdImpl extends AbstrAsyncDockerCmd<ExecStartCmd, Frame> implements ExecStartCmd {
 
+    @JsonIgnore
     private String execId;
 
-    private Boolean detach, tty;
+    @JsonProperty("Detach")
+    private Boolean detach;
+
+    @JsonProperty("Tty")
+    private Boolean tty;
+
+    @JsonIgnore
+    private InputStream stdin;
 
     public ExecStartCmdImpl(ExecStartCmd.Exec exec, String execId) {
         super(exec);
@@ -41,6 +56,12 @@ public class ExecStartCmdImpl extends AbstrDockerCmd<ExecStartCmd, InputStream> 
     }
 
     @Override
+    @JsonIgnore
+    public InputStream getStdin() {
+        return stdin;
+    }
+
+    @Override
     public ExecStartCmd withDetach(Boolean detach) {
         this.detach = detach;
         return this;
@@ -52,13 +73,18 @@ public class ExecStartCmdImpl extends AbstrDockerCmd<ExecStartCmd, InputStream> 
         return this;
     }
 
+    @Override
+    public ExecStartCmd withStdIn(InputStream stdin) {
+        this.stdin = stdin;
+        return this;
+    }
+
     /**
-     * @throws com.github.dockerjava.api.NotFoundException
+     * @throws NotFoundException
      *             No such exec instance
      */
     @Override
-    public InputStream exec() throws NotFoundException {
-        return super.exec();
+    public <T extends ResultCallback<Frame>> T exec(T resultCallback) {
+        return super.exec(resultCallback);
     }
-
 }

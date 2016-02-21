@@ -1,8 +1,11 @@
 package com.github.dockerjava.api.command;
 
 import java.util.List;
-import java.util.Map;
 
+import javax.annotation.CheckForNull;
+
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,11 +13,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.dockerjava.api.model.ContainerConfig;
 import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.NetworkSettings;
+import com.github.dockerjava.api.model.Volume;
 import com.github.dockerjava.api.model.VolumeBind;
 import com.github.dockerjava.api.model.VolumeBinds;
 import com.github.dockerjava.api.model.VolumeRW;
 import com.github.dockerjava.api.model.VolumesRW;
+import com.github.dockerjava.core.RemoteApiVersion;
 
 /**
  *
@@ -60,6 +65,12 @@ public class InspectContainerResponse {
     @JsonProperty("Name")
     private String name;
 
+    /**
+     * @since {@link RemoteApiVersion#VERSION_1_17}
+     */
+    @JsonProperty("RestartCount")
+    private Integer restartCount;
+
     @JsonProperty("NetworkSettings")
     private NetworkSettings networkSettings;
 
@@ -83,6 +94,9 @@ public class InspectContainerResponse {
 
     @JsonProperty("VolumesRW")
     private VolumesRW volumesRW;
+
+    @JsonProperty("Mounts")
+    private List<Mount> mounts;
 
     public String getId() {
         return id;
@@ -126,12 +140,17 @@ public class InspectContainerResponse {
 
     @JsonIgnore
     public VolumeBind[] getVolumes() {
-        return volumes.getBinds();
+        return volumes == null ? null : volumes.getBinds();
     }
 
+    /**
+     * @deprecated As of {@link RemoteApiVersion#VERSION_1_20} use {@link #getMounts()} instead
+     */
     @JsonIgnore
+    @Deprecated
+    @CheckForNull
     public VolumeRW[] getVolumesRW() {
-        return volumesRW.getVolumesRW();
+        return volumesRW == null ? null : volumesRW.getVolumesRW();
     }
 
     public String getHostnamePath() {
@@ -144,6 +163,10 @@ public class InspectContainerResponse {
 
     public String getName() {
         return name;
+    }
+
+    public Integer getRestartCount() {
+        return restartCount;
     }
 
     public String getDriver() {
@@ -162,6 +185,14 @@ public class InspectContainerResponse {
         return mountLabel;
     }
 
+    /**
+     * @since {@link RemoteApiVersion#VERSION_1_20}
+     */
+    @CheckForNull
+    public List<Mount> getMounts() {
+        return mounts;
+    }
+
     public List<String> getExecIds() {
         return execIds;
     }
@@ -172,48 +203,183 @@ public class InspectContainerResponse {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public class NetworkSettings {
+    public class ContainerState {
 
-        @JsonProperty("IPAddress")
-        private String ipAddress;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_20}
+         */
+        @CheckForNull
+        @JsonProperty("Status")
+        private String status;
 
-        @JsonProperty("IPPrefixLen")
-        private Integer ipPrefixLen;
+        /**
+         * @since < {@link RemoteApiVersion#VERSION_1_16}
+         */
+        @CheckForNull
+        @JsonProperty("Running")
+        private Boolean running;
 
-        @JsonProperty("Gateway")
-        private String gateway;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_17}
+         */
+        @CheckForNull
+        @JsonProperty("Paused")
+        private Boolean paused;
 
-        @JsonProperty("Bridge")
-        private String bridge;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_17}
+         */
+        @CheckForNull
+        @JsonProperty("Restarting")
+        private Boolean restarting;
 
-        @JsonProperty("PortMapping")
-        private Map<String, Map<String, String>> portMapping;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_17}
+         */
+        @CheckForNull
+        @JsonProperty("OOMKilled")
+        private Boolean oomKilled;
 
-        @JsonProperty("Ports")
-        private Ports ports;
+        /**
+         * <a href="https://github.com/docker/docker/pull/18127">Unclear</a>
+         *
+         * @since {@link RemoteApiVersion#UNKNOWN_VERSION}
+         */
+        @CheckForNull
+        @JsonProperty("Dead")
+        private Boolean dead;
 
-        public String getIpAddress() {
-            return ipAddress;
+        /**
+         * @since < {@link RemoteApiVersion#VERSION_1_16}
+         */
+        @CheckForNull
+        @JsonProperty("Pid")
+        private Integer pid;
+
+        /**
+         * @since < {@link RemoteApiVersion#VERSION_1_16}
+         */
+        @CheckForNull
+        @JsonProperty("ExitCode")
+        private Integer exitCode;
+
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_17}
+         */
+        @CheckForNull
+        @JsonProperty("Error")
+        private String error;
+
+        /**
+         * @since < {@link RemoteApiVersion#VERSION_1_16}
+         */
+        @CheckForNull
+        @JsonProperty("StartedAt")
+        private String startedAt;
+
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_17}
+         */
+        @CheckForNull
+        @JsonProperty("FinishedAt")
+        private String finishedAt;
+
+        /**
+         * See {@link #status}
+         */
+        @CheckForNull
+        public String getStatus() {
+            return status;
         }
 
-        public Integer getIpPrefixLen() {
-            return ipPrefixLen;
+        /**
+         * See {@link #running}
+         */
+        @CheckForNull
+        public Boolean getRunning() {
+            return running;
         }
 
-        public String getGateway() {
-            return gateway;
+        /**
+         * See {@link #paused}
+         */
+        @CheckForNull
+        public Boolean getPaused() {
+            return paused;
         }
 
-        public String getBridge() {
-            return bridge;
+        /**
+         * See {@link #restarting}
+         */
+        @CheckForNull
+        public Boolean getRestarting() {
+            return restarting;
         }
 
-        public Map<String, Map<String, String>> getPortMapping() {
-            return portMapping;
+        /**
+         * See {@link #oomKilled}
+         */
+        @CheckForNull
+        public Boolean getOOMKilled() {
+            return oomKilled;
         }
 
-        public Ports getPorts() {
-            return ports;
+        /**
+         * See {@link #dead}
+         */
+        @CheckForNull
+        public Boolean getDead() {
+            return dead;
+        }
+
+        /**
+         * See {@link #pid}
+         */
+        @CheckForNull
+        public Integer getPid() {
+            return pid;
+        }
+
+        /**
+         * See {@link #exitCode}
+         */
+        @CheckForNull
+        public Integer getExitCode() {
+            return exitCode;
+        }
+
+        /**
+         * See {@link #error}
+         */
+        @CheckForNull
+        public String getError() {
+            return error;
+        }
+
+        /**
+         * See {@link #startedAt}
+         */
+        @CheckForNull
+        public String getStartedAt() {
+            return startedAt;
+        }
+
+        /**
+         * See {@link #finishedAt}
+         */
+        @CheckForNull
+        public String getFinishedAt() {
+            return finishedAt;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return EqualsBuilder.reflectionEquals(this, o);
+        }
+
+        @Override
+        public int hashCode() {
+            return HashCodeBuilder.reflectionHashCode(this);
         }
 
         @Override
@@ -223,54 +389,78 @@ public class InspectContainerResponse {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public class ContainerState {
+    public static class Mount {
 
-        @JsonProperty("Running")
-        private Boolean running;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_20}
+         */
+        @CheckForNull
+        @JsonProperty("Name")
+        private String name;
 
-        @JsonProperty("Paused")
-        private Boolean paused;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_20}
+         */
+        @CheckForNull
+        @JsonProperty("Source")
+        private String source;
 
-        @JsonProperty("Pid")
-        private Integer pid;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_20}
+         */
+        @CheckForNull
+        @JsonProperty("Destination")
+        private Volume destination;
 
-        @JsonProperty("ExitCode")
-        private Integer exitCode;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_20}
+         */
+        @CheckForNull
+        @JsonProperty("Driver")
+        private String driver;
 
-        @JsonProperty("StartedAt")
-        private String startedAt;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_20}
+         */
+        @CheckForNull
+        @JsonProperty("Mode")
+        private String mode;
 
-        @JsonProperty("FinishedAt")
-        private String finishedAt;
+        /**
+         * @since {@link RemoteApiVersion#VERSION_1_20}
+         */
+        @CheckForNull
+        @JsonProperty("RW")
+        private Boolean rw;
 
-        public Boolean isRunning() {
-            return running;
+        @CheckForNull
+        public String getName() {
+            return name;
         }
 
-        public Boolean isPaused() {
-            return paused;
+        @CheckForNull
+        public String getSource() {
+            return source;
         }
 
-        public Integer getPid() {
-            return pid;
+        @CheckForNull
+        public Volume getDestination() {
+            return destination;
         }
 
-        public Integer getExitCode() {
-            return exitCode;
+        @CheckForNull
+        public String getDriver() {
+            return driver;
         }
 
-        public String getStartedAt() {
-            return startedAt;
+        @CheckForNull
+        public String getMode() {
+            return mode;
         }
 
-        public String getFinishedAt() {
-            return finishedAt;
-        }
-
-        @Override
-        public String toString() {
-            return ToStringBuilder.reflectionToString(this);
+        @CheckForNull
+        public Boolean getRW() {
+            return rw;
         }
     }
-
 }

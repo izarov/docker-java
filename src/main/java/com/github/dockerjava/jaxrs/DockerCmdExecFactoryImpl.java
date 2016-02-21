@@ -1,51 +1,22 @@
 package com.github.dockerjava.jaxrs;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.github.dockerjava.api.DockerClientException;
-import com.github.dockerjava.api.command.AttachContainerCmd;
-import com.github.dockerjava.api.command.AuthCmd;
-import com.github.dockerjava.api.command.BuildImageCmd;
-import com.github.dockerjava.api.command.CommitCmd;
-import com.github.dockerjava.api.command.ContainerDiffCmd;
-import com.github.dockerjava.api.command.CopyFileFromContainerCmd;
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.command.CreateImageCmd;
-import com.github.dockerjava.api.command.DockerCmdExecFactory;
-import com.github.dockerjava.api.command.EventsCmd;
-import com.github.dockerjava.api.command.ExecCreateCmd;
-import com.github.dockerjava.api.command.ExecStartCmd;
-import com.github.dockerjava.api.command.InfoCmd;
-import com.github.dockerjava.api.command.InspectContainerCmd;
-import com.github.dockerjava.api.command.InspectExecCmd;
-import com.github.dockerjava.api.command.InspectImageCmd;
-import com.github.dockerjava.api.command.KillContainerCmd;
-import com.github.dockerjava.api.command.ListContainersCmd;
-import com.github.dockerjava.api.command.ListImagesCmd;
-import com.github.dockerjava.api.command.LogContainerCmd;
-import com.github.dockerjava.api.command.PauseContainerCmd;
-import com.github.dockerjava.api.command.PingCmd;
-import com.github.dockerjava.api.command.PullImageCmd;
-import com.github.dockerjava.api.command.PushImageCmd;
-import com.github.dockerjava.api.command.RemoveContainerCmd;
-import com.github.dockerjava.api.command.RemoveImageCmd;
-import com.github.dockerjava.api.command.ResizeContainerCmd;
-import com.github.dockerjava.api.command.RestartContainerCmd;
-import com.github.dockerjava.api.command.SaveImageCmd;
-import com.github.dockerjava.api.command.SearchImagesCmd;
-import com.github.dockerjava.api.command.StartContainerCmd;
-import com.github.dockerjava.api.command.StatsCmd;
-import com.github.dockerjava.api.command.StopContainerCmd;
-import com.github.dockerjava.api.command.TagImageCmd;
-import com.github.dockerjava.api.command.TopContainerCmd;
-import com.github.dockerjava.api.command.UnpauseContainerCmd;
-import com.github.dockerjava.api.command.VersionCmd;
-import com.github.dockerjava.api.command.WaitContainerCmd;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.github.dockerjava.core.RemoteApiVersion;
-import com.github.dockerjava.jaxrs.connector.ApacheConnectorProvider;
-import com.github.dockerjava.jaxrs.filter.JsonClientFilter;
-import com.github.dockerjava.jaxrs.filter.ResponseStatusExceptionFilter;
-import com.github.dockerjava.jaxrs.filter.SelectiveLoggingFilter;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ClientRequestFilter;
+import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.client.WebTarget;
+
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
@@ -58,16 +29,64 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ClientRequestFilter;
-import javax.ws.rs.client.ClientResponseFilter;
-import javax.ws.rs.client.WebTarget;
-import java.io.IOException;
-import java.net.URI;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.github.dockerjava.api.command.AttachContainerCmd;
+import com.github.dockerjava.api.command.AuthCmd;
+import com.github.dockerjava.api.command.BuildImageCmd;
+import com.github.dockerjava.api.command.CommitCmd;
+import com.github.dockerjava.api.command.ConnectToNetworkCmd;
+import com.github.dockerjava.api.command.ContainerDiffCmd;
+import com.github.dockerjava.api.command.CopyArchiveFromContainerCmd;
+import com.github.dockerjava.api.command.CopyArchiveToContainerCmd;
+import com.github.dockerjava.api.command.CopyFileFromContainerCmd;
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.CreateImageCmd;
+import com.github.dockerjava.api.command.CreateNetworkCmd;
+import com.github.dockerjava.api.command.CreateVolumeCmd;
+import com.github.dockerjava.api.command.DisconnectFromNetworkCmd;
+import com.github.dockerjava.api.command.DockerCmdExecFactory;
+import com.github.dockerjava.api.command.EventsCmd;
+import com.github.dockerjava.api.command.ExecCreateCmd;
+import com.github.dockerjava.api.command.ExecStartCmd;
+import com.github.dockerjava.api.command.InfoCmd;
+import com.github.dockerjava.api.command.InspectContainerCmd;
+import com.github.dockerjava.api.command.InspectExecCmd;
+import com.github.dockerjava.api.command.InspectImageCmd;
+import com.github.dockerjava.api.command.InspectNetworkCmd;
+import com.github.dockerjava.api.command.InspectVolumeCmd;
+import com.github.dockerjava.api.command.KillContainerCmd;
+import com.github.dockerjava.api.command.ListContainersCmd;
+import com.github.dockerjava.api.command.ListImagesCmd;
+import com.github.dockerjava.api.command.ListNetworksCmd;
+import com.github.dockerjava.api.command.ListVolumesCmd;
+import com.github.dockerjava.api.command.LogContainerCmd;
+import com.github.dockerjava.api.command.PauseContainerCmd;
+import com.github.dockerjava.api.command.PingCmd;
+import com.github.dockerjava.api.command.PullImageCmd;
+import com.github.dockerjava.api.command.PushImageCmd;
+import com.github.dockerjava.api.command.RemoveContainerCmd;
+import com.github.dockerjava.api.command.RemoveImageCmd;
+import com.github.dockerjava.api.command.ResizeContainerCmd;
+import com.github.dockerjava.api.command.RemoveNetworkCmd;
+import com.github.dockerjava.api.command.RemoveVolumeCmd;
+import com.github.dockerjava.api.command.RestartContainerCmd;
+import com.github.dockerjava.api.command.SaveImageCmd;
+import com.github.dockerjava.api.command.SearchImagesCmd;
+import com.github.dockerjava.api.command.StartContainerCmd;
+import com.github.dockerjava.api.command.StatsCmd;
+import com.github.dockerjava.api.command.StopContainerCmd;
+import com.github.dockerjava.api.command.TagImageCmd;
+import com.github.dockerjava.api.command.TopContainerCmd;
+import com.github.dockerjava.api.command.UnpauseContainerCmd;
+import com.github.dockerjava.api.command.VersionCmd;
+import com.github.dockerjava.api.command.WaitContainerCmd;
+import com.github.dockerjava.api.exception.DockerClientException;
+import com.github.dockerjava.core.DockerClientConfig;
+import com.github.dockerjava.core.LocalDirectorySSLConfig;
+import com.github.dockerjava.jaxrs.connector.ApacheConnectorProvider;
+import com.github.dockerjava.jaxrs.filter.JsonClientFilter;
+import com.github.dockerjava.jaxrs.filter.ResponseStatusExceptionFilter;
+import com.github.dockerjava.jaxrs.filter.SelectiveLoggingFilter;
 
 //import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 // see https://github.com/docker-java/docker-java/issues/196
@@ -94,9 +113,12 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
     private DockerClientConfig dockerClientConfig;
 
+    SSLContext sslContext = null;
+
     @Override
     public void init(DockerClientConfig dockerClientConfig) {
         checkNotNull(dockerClientConfig, "config was not specified");
+        this.dockerClientConfig = dockerClientConfig;
 
         ClientConfig clientConfig = new ClientConfig();
         clientConfig.connectorProvider(new ApacheConnectorProvider());
@@ -119,37 +141,60 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
         if (clientResponseFilters != null) {
             for (ClientResponseFilter clientResponseFilter : clientResponseFilters) {
-                if (clientResponseFilter != null)
+                if (clientResponseFilter != null) {
                     clientConfig.register(clientResponseFilter);
+                }
             }
         }
 
         if (clientRequestFilters != null) {
             for (ClientRequestFilter clientRequestFilter : clientRequestFilters) {
-                if (clientRequestFilter != null)
+                if (clientRequestFilter != null) {
                     clientConfig.register(clientRequestFilter);
+                }
             }
         }
 
-        URI originalUri = dockerClientConfig.getUri();
+        URI originalUri = dockerClientConfig.getDockerHost();
 
-        SSLContext sslContext = null;
+        String protocol = null;
 
-        if (dockerClientConfig.getSslConfig() != null) {
+        if (dockerClientConfig.getDockerTlsVerify()) {
+            protocol = "https";
+
             try {
-                sslContext = dockerClientConfig.getSslConfig().getSSLContext();
+
+                if (sslContext == null) {
+                    sslContext = new LocalDirectorySSLConfig(dockerClientConfig.getDockerCertPath()).getSSLContext();
+                }
+
             } catch (Exception ex) {
                 throw new DockerClientException("Error in SSL Configuration", ex);
             }
+        } else {
+            protocol = "http";
+        }
+
+        if (!originalUri.getScheme().equals("unix")) {
+
+            try {
+                originalUri = new URI(originalUri.toString().replaceFirst("tcp", protocol));
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+
+            configureProxy(clientConfig, protocol);
         }
 
         PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(getSchemeRegistry(
                 originalUri, sslContext));
 
-        if (maxTotalConnections != null)
+        if (maxTotalConnections != null) {
             connManager.setMaxTotal(maxTotalConnections);
-        if (maxPerRouteConnections != null)
+        }
+        if (maxPerRouteConnections != null) {
             connManager.setDefaultMaxPerRoute(maxPerRouteConnections);
+        }
 
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connManager);
 
@@ -165,13 +210,38 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
         client = clientBuilder.build();
 
+        baseResource = client.target(sanitizeUrl(originalUri).toString()).path(dockerClientConfig.getApiVersion().asWebPathPart());
+    }
+
+    private URI sanitizeUrl(URI originalUri) {
         if (originalUri.getScheme().equals("unix")) {
-            dockerClientConfig.setUri(UnixConnectionSocketFactory.sanitizeUri(originalUri));
+            return UnixConnectionSocketFactory.sanitizeUri(originalUri);
         }
+        return originalUri;
+    }
 
-        baseResource = client.target(dockerClientConfig.getUri()).path(dockerClientConfig.getVersion().asWebPathPart());
+    private void configureProxy(ClientConfig clientConfig, String protocol) {
 
-        this.dockerClientConfig = dockerClientConfig;
+        List<Proxy> proxies = ProxySelector.getDefault().select(dockerClientConfig.getDockerHost());
+
+        for (Proxy proxy : proxies) {
+            InetSocketAddress address = (InetSocketAddress) proxy.address();
+            if (address != null) {
+                String hostname = address.getHostName();
+                int port = address.getPort();
+
+                clientConfig.property(ClientProperties.PROXY_URI, protocol + "://" + hostname + ":" + port);
+
+                String httpProxyUser = System.getProperty(protocol + ".proxyUser");
+                if (httpProxyUser != null) {
+                    clientConfig.property(ClientProperties.PROXY_USERNAME, httpProxyUser);
+                    String httpProxyPassword = System.getProperty(protocol + ".proxyPassword");
+                    if (httpProxyPassword != null) {
+                        clientConfig.property(ClientProperties.PROXY_PASSWORD, httpProxyPassword);
+                    }
+                }
+            }
+        }
     }
 
     private org.apache.http.config.Registry<ConnectionSocketFactory> getSchemeRegistry(final URI originalUri,
@@ -317,8 +387,18 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
     }
 
     @Override
+    public CopyArchiveFromContainerCmd.Exec createCopyArchiveFromContainerCmdExec() {
+        return new CopyArchiveFromContainerCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
     public CopyFileFromContainerCmd.Exec createCopyFileFromContainerCmdExec() {
         return new CopyFileFromContainerCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public CopyArchiveToContainerCmd.Exec createCopyArchiveToContainerCmdExec() {
+        return new CopyArchiveToContainerCmdExec(getBaseResource(), getDockerClientConfig());
     }
 
     @Override
@@ -382,9 +462,70 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
     }
 
     @Override
+    public CreateVolumeCmd.Exec createCreateVolumeCmdExec() {
+        return new CreateVolumeCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public InspectVolumeCmd.Exec createInspectVolumeCmdExec() {
+        return new InspectVolumeCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public RemoveVolumeCmd.Exec createRemoveVolumeCmdExec() {
+        return new RemoveVolumeCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public ListVolumesCmd.Exec createListVolumesCmdExec() {
+        return new ListVolumesCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public ListNetworksCmd.Exec createListNetworksCmdExec() {
+        return new ListNetworksCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public InspectNetworkCmd.Exec createInspectNetworkCmdExec() {
+
+        return new InspectNetworkCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public CreateNetworkCmd.Exec createCreateNetworkCmdExec() {
+
+        return new CreateNetworkCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public RemoveNetworkCmd.Exec createRemoveNetworkCmdExec() {
+
+        return new RemoveNetworkCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public ConnectToNetworkCmd.Exec createConnectToNetworkCmdExec() {
+
+        return new ConnectToNetworkCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public DisconnectFromNetworkCmd.Exec createDisconnectFromNetworkCmdExec() {
+
+        return new DisconnectFromNetworkCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
     public void close() throws IOException {
         checkNotNull(client, "Factory not initialized. You probably forgot to call init()!");
         client.close();
+    }
+
+    @Override
+    public DockerCmdExecFactoryImpl withSSLContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
+        return this;
     }
 
     public DockerCmdExecFactoryImpl withReadTimeout(Integer readTimeout) {

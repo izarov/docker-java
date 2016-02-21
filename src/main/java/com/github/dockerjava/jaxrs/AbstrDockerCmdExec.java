@@ -1,16 +1,18 @@
 package com.github.dockerjava.jaxrs;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.IOException;
+
+import javax.ws.rs.client.WebTarget;
+
+import org.apache.commons.codec.binary.Base64;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.AuthConfigurations;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.RemoteApiVersion;
-import org.apache.commons.codec.binary.Base64;
-
-import javax.ws.rs.client.WebTarget;
-import java.io.IOException;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class AbstrDockerCmdExec {
 
@@ -44,7 +46,7 @@ public abstract class AbstrDockerCmdExec {
     protected String registryConfigs(AuthConfigurations authConfigs) {
         try {
             final String json;
-            if (dockerClientConfig.getVersion().isGreaterOrEqual(RemoteApiVersion.VERSION_1_19)) {
+            if (dockerClientConfig.getApiVersion().isGreaterOrEqual(RemoteApiVersion.VERSION_1_19)) {
                 json = new ObjectMapper().writeValueAsString(authConfigs.getConfigs());
             } else {
                 json = new ObjectMapper().writeValueAsString(authConfigs);

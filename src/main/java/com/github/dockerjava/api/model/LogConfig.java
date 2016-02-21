@@ -22,9 +22,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  *
  * json-file (default) syslog journald none
  *
- * If a driver is specified that is NOT supported,docker will default to null. If configs are supplied that are not
- * supported by the type docker will ignore them. In most cases setting the config option to null will suffice. Consult
- * the docker remote API for a more detailed and up-to-date explanation of the available types and their options.
+ * If a driver is specified that is NOT supported,docker will default to null. If configs are supplied that are not supported by the type
+ * docker will ignore them. In most cases setting the config option to null will suffice. Consult the docker remote API for a more detailed
+ * and up-to-date explanation of the available types and their options.
  */
 public class LogConfig {
 
@@ -69,7 +69,15 @@ public class LogConfig {
     @JsonDeserialize(using = LoggingType.Deserializer.class)
     @JsonSerialize(using = LoggingType.Serializer.class)
     public static enum LoggingType {
-        DEFAULT("json-file"), JSON_FILE("json-file"), NONE("none"), SYSLOG("syslog"), JOURNALD("journald");
+        DEFAULT("json-file"),
+        JSON_FILE("json-file"),
+        NONE("none"),
+        SYSLOG("syslog"),
+        JOURNALD("journald"),
+        GELF("gelf"),
+        FLUENTD("fluentd"),
+        AWSLOGS("awslogs"),
+        SPLUNK("splunk");
 
         private String type;
 
@@ -98,8 +106,9 @@ public class LogConfig {
                 JsonNode node = oc.readTree(jsonParser);
 
                 for (LoggingType loggingType : values()) {
-                    if (loggingType.getType().equals(node.asText()))
+                    if (loggingType.getType().equals(node.asText())) {
                         return loggingType;
+                    }
                 }
 
                 throw new IllegalArgumentException("No enum constant " + LoggingType.class + "." + node.asText());

@@ -26,41 +26,45 @@ import com.github.dockerjava.api.model.Frame;
 public interface AttachContainerCmd extends AsyncDockerCmd<AttachContainerCmd, Frame> {
 
     @CheckForNull
-    public String getContainerId();
+    String getContainerId();
 
     @CheckForNull
-    public Boolean hasLogsEnabled();
+    Boolean hasLogsEnabled();
 
     @CheckForNull
-    public Boolean hasFollowStreamEnabled();
+    Boolean hasFollowStreamEnabled();
 
     @CheckForNull
-    public Boolean hasTimestampsEnabled();
+    Boolean hasTimestampsEnabled();
 
     @CheckForNull
-    public Boolean hasStdoutEnabled();
+    Boolean hasStdoutEnabled();
 
     @CheckForNull
-    public Boolean hasStderrEnabled();
+    Boolean hasStderrEnabled();
 
-    public AttachContainerCmd withContainerId(@Nonnull String containerId);
+    @CheckForNull
+    InputStream getStdin();
+
+    AttachContainerCmd withContainerId(@Nonnull String containerId);
 
     /**
      * Following the stream means the resulting {@link InputStream} returned by {@link #exec()} reads infinitely. So a
-     * {@link InputStream#read()} MAY BLOCK FOREVER as long as no data is streamed from the docker host to
-     * {@link DockerClient}!
+     * {@link InputStream#read()} MAY BLOCK FOREVER as long as no data is streamed from the docker host to {@link DockerClient}!
      */
-    public AttachContainerCmd withFollowStream(Boolean followStream);
+    AttachContainerCmd withFollowStream(Boolean followStream);
 
-    public AttachContainerCmd withTimestamps(Boolean timestamps);
+    AttachContainerCmd withTimestamps(Boolean timestamps);
 
-    public AttachContainerCmd withStdOut(Boolean stdout);
+    AttachContainerCmd withStdOut(Boolean stdout);
 
-    public AttachContainerCmd withStdErr(Boolean stderr);
+    AttachContainerCmd withStdErr(Boolean stderr);
 
-    public AttachContainerCmd withLogs(Boolean logs);
+    AttachContainerCmd withStdIn(InputStream stdin);
 
-    public static interface Exec extends DockerCmdAsyncExec<AttachContainerCmd, Frame> {
+    AttachContainerCmd withLogs(Boolean logs);
+
+    interface Exec extends DockerCmdAsyncExec<AttachContainerCmd, Frame> {
     }
 
 }

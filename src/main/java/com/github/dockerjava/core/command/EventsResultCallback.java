@@ -11,12 +11,12 @@ import com.github.dockerjava.core.async.ResultCallbackTemplate;
 
 /**
  *
- * @author marcus
+ * @author Marcus Linke
  *
  */
 public class EventsResultCallback extends ResultCallbackTemplate<EventsResultCallback, Event> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(EventsResultCallback.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventsResultCallback.class);
 
     @Override
     public void onNext(Event item) {

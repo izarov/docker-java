@@ -3,6 +3,7 @@
  */
 package com.github.dockerjava.core;
 
+import com.github.dockerjava.core.exception.InvalidRepositoryNameException;
 import org.apache.commons.lang.StringUtils;
 import org.testng.annotations.Test;
 
@@ -15,7 +16,7 @@ import com.github.dockerjava.core.NameParser.ReposTag;
 /**
  *
  *
- * @author marcus
+ * @author Marcus Linke
  *
  */
 public class NameParserTest {

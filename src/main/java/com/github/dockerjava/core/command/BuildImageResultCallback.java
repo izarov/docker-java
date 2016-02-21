@@ -5,23 +5,23 @@ package com.github.dockerjava.core.command;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.CheckForNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.dockerjava.api.DockerClientException;
+import com.github.dockerjava.api.exception.DockerClientException;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.core.async.ResultCallbackTemplate;
 
-import javax.annotation.CheckForNull;
-
 /**
  *
- * @author marcus
+ * @author Marcus Linke
  *
  */
 public class BuildImageResultCallback extends ResultCallbackTemplate<BuildImageResultCallback, BuildResponseItem> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(BuildImageResultCallback.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BuildImageResultCallback.class);
 
     @CheckForNull
     private BuildResponseItem latestItem = null;

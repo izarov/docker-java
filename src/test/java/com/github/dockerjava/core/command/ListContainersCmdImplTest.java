@@ -26,7 +26,6 @@ import org.testng.annotations.Test;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.Filters;
 import com.github.dockerjava.client.AbstractDockerClientTest;
 import com.google.common.collect.ImmutableMap;
 
@@ -53,6 +52,7 @@ public class ListContainersCmdImplTest extends AbstractDockerClientTest {
         super.afterMethod(result);
     }
 
+    @Test
     public void testListContainers() throws Exception {
 
         String testImage = "busybox";
@@ -152,14 +152,14 @@ public class ListContainersCmdImplTest extends AbstractDockerClientTest {
         // list with filter by label
         dockerClient.createContainerCmd(testImage).withCmd("echo").withLabels(labels).exec();
         filteredContainers = dockerClient.listContainersCmd().withShowAll(true)
-                .withFilters(new Filters().withLabels(labels)).exec();
+                .withLabelFilter(labels).exec();
         assertThat(filteredContainers.size(), is(equalTo(1)));
         Container container3 = filteredContainers.get(0);
         assertThat(container3.getCommand(), not(isEmptyString()));
         assertThat(container3.getImage(), startsWith(testImage));
 
         filteredContainers = dockerClient.listContainersCmd().withShowAll(true)
-                .withFilters(new Filters().withLabels("test")).exec();
+                .withLabelFilter("test").exec();
         assertThat(filteredContainers.size(), is(equalTo(1)));
         container3 = filteredContainers.get(0);
         assertThat(container3.getCommand(), not(isEmptyString()));

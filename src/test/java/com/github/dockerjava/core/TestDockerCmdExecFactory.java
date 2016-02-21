@@ -5,8 +5,10 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.SSLContext;
+
 import com.github.dockerjava.api.async.ResultCallback;
-import com.github.dockerjava.api.command.AttachContainerCmd;
+import com.github.dockerjava.api.command.*;
 import com.github.dockerjava.api.command.AuthCmd.Exec;
 import com.github.dockerjava.api.command.BuildImageCmd;
 import com.github.dockerjava.api.command.CommitCmd;
@@ -49,17 +51,20 @@ import com.github.dockerjava.api.command.WaitContainerCmd;
 import com.github.dockerjava.api.model.BuildResponseItem;
 
 /**
- * Special {@link DockerCmdExecFactory} implementation that collects container and image creations while test execution
- * for the purpose of automatically cleanup.
+ * Special {@link DockerCmdExecFactory} implementation that collects container and image creations while test execution for the purpose of
+ * automatically cleanup.
  *
- * @author marcus
- *
+ * @author Marcus Linke
  */
 public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
 
     private List<String> containerNames = new ArrayList<String>();
 
     private List<String> imageNames = new ArrayList<String>();
+
+    private List<String> volumeNames = new ArrayList<String>();
+
+    private List<String> networkIds = new ArrayList<>();
 
     private DockerCmdExecFactory delegate;
 
@@ -244,6 +249,16 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
     }
 
     @Override
+    public CopyArchiveFromContainerCmd.Exec createCopyArchiveFromContainerCmdExec() {
+        return delegate.createCopyArchiveFromContainerCmdExec();
+    }
+
+    @Override
+    public CopyArchiveToContainerCmd.Exec createCopyArchiveToContainerCmdExec() {
+        return delegate.createCopyArchiveToContainerCmdExec();
+    }
+
+    @Override
     public StopContainerCmd.Exec createStopContainerCmdExec() {
         return delegate.createStopContainerCmdExec();
     }
@@ -303,6 +318,85 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
         return delegate.createStatsCmdExec();
     }
 
+    @Override
+    public CreateVolumeCmd.Exec createCreateVolumeCmdExec() {
+        return new CreateVolumeCmd.Exec() {
+            @Override
+            public CreateVolumeResponse exec(CreateVolumeCmd command) {
+                CreateVolumeResponse result = delegate.createCreateVolumeCmdExec().exec(command);
+                volumeNames.add(command.getName());
+                return result;
+            }
+        };
+    }
+
+    @Override
+    public InspectVolumeCmd.Exec createInspectVolumeCmdExec() {
+        return delegate.createInspectVolumeCmdExec();
+    }
+
+    @Override
+    public RemoveVolumeCmd.Exec createRemoveVolumeCmdExec() {
+        return new RemoveVolumeCmd.Exec() {
+            @Override
+            public Void exec(RemoveVolumeCmd command) {
+                delegate.createRemoveVolumeCmdExec().exec(command);
+                volumeNames.remove(command.getName());
+                return null;
+            }
+        };
+    }
+
+    @Override
+    public ListVolumesCmd.Exec createListVolumesCmdExec() {
+        return delegate.createListVolumesCmdExec();
+    }
+
+    @Override
+    public ListNetworksCmd.Exec createListNetworksCmdExec() {
+        return delegate.createListNetworksCmdExec();
+    }
+
+    @Override
+    public InspectNetworkCmd.Exec createInspectNetworkCmdExec() {
+        return delegate.createInspectNetworkCmdExec();
+    }
+
+    @Override
+    public CreateNetworkCmd.Exec createCreateNetworkCmdExec() {
+
+        return new CreateNetworkCmd.Exec() {
+            @Override
+            public CreateNetworkResponse exec(CreateNetworkCmd command) {
+                CreateNetworkResponse result = delegate.createCreateNetworkCmdExec().exec(command);
+                networkIds.add(result.getId());
+                return result;
+            }
+        };
+    }
+
+    @Override
+    public RemoveNetworkCmd.Exec createRemoveNetworkCmdExec() {
+        return new RemoveNetworkCmd.Exec() {
+            @Override
+            public Void exec(RemoveNetworkCmd command) {
+                delegate.createRemoveNetworkCmdExec().exec(command);
+                networkIds.remove(command.getNetworkId());
+                return null;
+            }
+        };
+    }
+
+    @Override
+    public ConnectToNetworkCmd.Exec createConnectToNetworkCmdExec() {
+        return delegate.createConnectToNetworkCmdExec();
+    }
+
+    @Override
+    public DisconnectFromNetworkCmd.Exec createDisconnectFromNetworkCmdExec() {
+        return delegate.createDisconnectFromNetworkCmdExec();
+    }
+
     public List<String> getContainerNames() {
         return new ArrayList<String>(containerNames);
     }
@@ -311,4 +405,16 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
         return new ArrayList<String>(imageNames);
     }
 
+    public List<String> getVolumeNames() {
+        return new ArrayList<String>(volumeNames);
+    }
+
+    public List<String> getNetworkIds() {
+        return new ArrayList<>(networkIds);
+    }
+
+    @Override
+    public DockerCmdExecFactory withSSLContext(SSLContext sslContext) {
+        return delegate.withSSLContext(sslContext);
+    }
 }

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -15,7 +16,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.github.dockerjava.api.NotFoundException;
+import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.client.AbstractDockerClientTest;
 
@@ -164,7 +165,7 @@ public class LogContainerCmdImplTest extends AbstractDockerClientTest {
 
         loggingCallback.awaitCompletion();
 
-        assertFalse(loggingCallback.toString().contains(snippet));
+        assertThat(loggingCallback.toString(), containsString(snippet));
     }
 
 }

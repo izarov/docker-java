@@ -2,17 +2,19 @@ package com.github.dockerjava.api.model;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.annotation.CheckForNull;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Represents a pull response stream item
  */
-@JsonIgnoreProperties(ignoreUnknown = false)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseItem implements Serializable {
 
     private static final long serialVersionUID = -5187169652557467828L;
@@ -37,7 +39,7 @@ public class ResponseItem implements Serializable {
     private String from;
 
     @JsonProperty("time")
-    private long time;
+    private Long time;
 
     @JsonProperty("errorDetail")
     private ErrorDetail errorDetail;
@@ -46,35 +48,43 @@ public class ResponseItem implements Serializable {
     @JsonProperty("error")
     private String error;
 
+    @CheckForNull
     public String getStream() {
         return stream;
     }
 
+    @CheckForNull
     public String getStatus() {
         return status;
     }
 
+    @CheckForNull
     public ProgressDetail getProgressDetail() {
         return progressDetail;
     }
 
+    @CheckForNull
     @Deprecated
     public String getProgress() {
         return progress;
     }
 
+    @CheckForNull
     public String getId() {
         return id;
     }
 
+    @CheckForNull
     public String getFrom() {
         return from;
     }
 
-    public long getTime() {
+    @CheckForNull
+    public Long getTime() {
         return time;
     }
 
+    @CheckForNull
     public ErrorDetail getErrorDetail() {
         return errorDetail;
     }
@@ -95,18 +105,33 @@ public class ResponseItem implements Serializable {
         return getError() != null || getErrorDetail() != null;
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = false)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ProgressDetail implements Serializable {
         private static final long serialVersionUID = -1954994695645715264L;
 
         @JsonProperty("current")
-        long current;
+        Long current;
 
         @JsonProperty("total")
-        long total;
+        Long total;
 
         @JsonProperty("start")
-        long start;
+        Long start;
+
+        @CheckForNull
+        public Long getCurrent() {
+            return current;
+        }
+
+        @CheckForNull
+        public Long getTotal() {
+            return total;
+        }
+
+        @CheckForNull
+        public Long getStart() {
+            return start;
+        }
 
         @Override
         public String toString() {
@@ -114,15 +139,25 @@ public class ResponseItem implements Serializable {
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = false)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ErrorDetail implements Serializable {
         private static final long serialVersionUID = -9136704865403084083L;
 
         @JsonProperty("code")
-        int code;
+        Integer code;
 
         @JsonProperty("message")
         String message;
+
+        @CheckForNull
+        public Integer getCode() {
+            return code;
+        }
+
+        @CheckForNull
+        public String getMessage() {
+            return message;
+        }
 
         @Override
         public String toString() {

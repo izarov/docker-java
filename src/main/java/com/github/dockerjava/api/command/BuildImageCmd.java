@@ -1,14 +1,16 @@
 package com.github.dockerjava.api.command;
 
-import com.github.dockerjava.api.model.AuthConfigurations;
-import com.github.dockerjava.api.model.BuildResponseItem;
+import java.io.File;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.Map;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URI;
+import com.github.dockerjava.api.model.AuthConfigurations;
+import com.github.dockerjava.api.model.BuildResponseItem;
+import com.github.dockerjava.core.RemoteApiVersion;
 
 /**
  * Build an image from Dockerfile.
@@ -87,6 +89,12 @@ public interface BuildImageCmd extends AsyncDockerCmd<BuildImageCmd, BuildRespon
     @CheckForNull
     public String getCpusetcpus();
 
+    /**
+     * @since {@link RemoteApiVersion#VERSION_1_21}
+     */
+    @CheckForNull
+    public Map<String, String> getBuildArgs();
+
     // setters
 
     public BuildImageCmd withTag(String tag);
@@ -114,6 +122,11 @@ public interface BuildImageCmd extends AsyncDockerCmd<BuildImageCmd, BuildRespon
     public BuildImageCmd withCpushares(String cpushares);
 
     public BuildImageCmd withCpusetcpus(String cpusetcpus);
+
+    /**
+     * @since {@link RemoteApiVersion#VERSION_1_21}
+     */
+    public BuildImageCmd withBuildArg(String key, String value);
 
     // setters lib specific
 

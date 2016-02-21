@@ -6,12 +6,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.github.dockerjava.api.command.BuildImageCmd;
 import com.github.dockerjava.api.model.AuthConfigurations;
 import com.github.dockerjava.api.model.BuildResponseItem;
-import com.github.dockerjava.core.FilePathUtil;
 import com.github.dockerjava.core.dockerfile.Dockerfile;
+import com.github.dockerjava.core.util.FilePathUtil;
 
 /**
  *
@@ -49,6 +51,8 @@ public class BuildImageCmdImpl extends AbstrAsyncDockerCmd<BuildImageCmd, BuildR
     private Long memswap;
 
     private URI remote;
+
+    private Map<String, String> buildArgs;
 
     public BuildImageCmdImpl(BuildImageCmd.Exec exec) {
         super(exec);
@@ -138,6 +142,11 @@ public class BuildImageCmdImpl extends AbstrAsyncDockerCmd<BuildImageCmd, BuildR
         return cpusetcpus;
     }
 
+    @Override
+    public Map<String, String> getBuildArgs() {
+        return buildArgs;
+    }
+
     // getter lib specific
 
     @Override
@@ -219,6 +228,15 @@ public class BuildImageCmdImpl extends AbstrAsyncDockerCmd<BuildImageCmd, BuildR
         return this;
     }
 
+    @Override
+    public BuildImageCmd withBuildArg(String key, String value) {
+        if (this.buildArgs == null) {
+            this.buildArgs = new HashMap<String, String>();
+        }
+        this.buildArgs.put(key, value);
+        return this;
+    }
+
     // lib specific
 
     @Override
@@ -230,13 +248,16 @@ public class BuildImageCmdImpl extends AbstrAsyncDockerCmd<BuildImageCmd, BuildR
     @Override
     public BuildImageCmdImpl withDockerfile(File dockerfile) {
         checkNotNull(dockerfile);
-        if (!dockerfile.exists())
+        if (!dockerfile.exists()) {
             throw new IllegalArgumentException("Dockerfile does not exist");
-        if (!dockerfile.isFile())
+        }
+        if (!dockerfile.isFile()) {
             throw new IllegalArgumentException("Not a directory");
+        }
 
-        if (baseDirectory == null)
+        if (baseDirectory == null) {
             withBaseDirectory(dockerfile.getParentFile());
+        }
 
         this.dockerFile = dockerfile;
 

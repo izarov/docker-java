@@ -6,11 +6,10 @@ import java.io.InputStream;
 import javax.ws.rs.core.Response;
 
 /**
- * This is a wrapper around {@link Response} that acts as a {@link InputStream}. When this
- * {@link WrappedResponseInputStream} is closed it closes the underlying {@link Response} object also to prevent
- * blocking/hanging connections.
+ * This is a wrapper around {@link Response} that acts as a {@link InputStream}. When this {@link WrappedResponseInputStream} is closed it
+ * closes the underlying {@link Response} object also to prevent blocking/hanging connections.
  *
- * @author marcus
+ * @author Marcus Linke
  */
 public class WrappedResponseInputStream extends InputStream {
 

@@ -3,23 +3,23 @@
  */
 package com.github.dockerjava.core.command;
 
+import javax.annotation.CheckForNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.dockerjava.api.DockerClientException;
+import com.github.dockerjava.api.exception.DockerClientException;
 import com.github.dockerjava.api.model.PushResponseItem;
 import com.github.dockerjava.core.async.ResultCallbackTemplate;
 
-import javax.annotation.CheckForNull;
-
 /**
  *
- * @author marcus
+ * @author Marcus Linke
  *
  */
 public class PushImageResultCallback extends ResultCallbackTemplate<PushImageResultCallback, PushResponseItem> {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(PushImageResultCallback.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushImageResultCallback.class);
 
     @CheckForNull
     private PushResponseItem latestItem = null;

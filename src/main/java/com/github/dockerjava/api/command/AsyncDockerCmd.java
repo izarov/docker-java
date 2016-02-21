@@ -8,11 +8,11 @@ import com.github.dockerjava.api.async.ResultCallback;
 /**
  *
  *
- * @author marcus
+ * @author Marcus Linke
  *
  */
 public interface AsyncDockerCmd<CMD_T extends AsyncDockerCmd<CMD_T, A_RES_T>, A_RES_T> extends DockerCmd<Void> {
 
-    public <T extends ResultCallback<A_RES_T>> T exec(T resultCallback);
+    <T extends ResultCallback<A_RES_T>> T exec(T resultCallback);
 
 }
