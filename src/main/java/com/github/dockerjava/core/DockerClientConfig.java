@@ -82,7 +82,7 @@ public class DockerClientConfig implements Serializable {
             boolean dockerTslVerify) {
         this.dockerHost = checkDockerHostScheme(dockerHost);
         this.dockerTlsVerify = dockerTslVerify;
-        this.dockerCertPath = checkDockerCertPath(dockerTslVerify, dockerCertPath);
+        this.dockerCertPath = dockerCertPath;
         this.dockerConfig = dockerConfig;
         this.apiVersion = RemoteApiVersion.parseConfigWithDefault(apiVersion);
         this.registryUsername = registryUsername;
