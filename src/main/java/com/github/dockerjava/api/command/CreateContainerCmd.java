@@ -179,6 +179,9 @@ public interface CreateContainerCmd extends SyncDockerCmd<CreateContainerRespons
     @CheckForNull
     public Boolean isTty();
 
+    @CheckForNull
+    public Map<String, String> getTmpfs();
+
     public CreateContainerCmd withAttachStderr(Boolean attachStderr);
 
     public CreateContainerCmd withAttachStdin(Boolean attachStdin);
@@ -401,6 +404,8 @@ public interface CreateContainerCmd extends SyncDockerCmd<CreateContainerRespons
      * Set the PID (Process) Namespace mode for the container, 'host': use the host's PID namespace inside the container
      */
     public CreateContainerCmd withPidMode(String pidMode);
+
+    public CreateContainerCmd withTmpfs(Map<String, String> tmpfs);
 
     /**
      * @throws NotFoundException

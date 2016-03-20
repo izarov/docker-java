@@ -394,6 +394,12 @@ public class CreateContainerCmdImpl extends AbstrDockerCmd<CreateContainerCmd, C
     }
 
     @Override
+    @JsonIgnore
+    public Map<String, String> getTmpfs() {
+        return hostConfig.getTmpfs();
+    }
+
+    @Override
     public String toString() {
         return new ToStringBuilder(this).append("create container ").append(name != null ? "name=" + name + " " : "")
                 .append(this).toString();
@@ -854,6 +860,13 @@ public class CreateContainerCmdImpl extends AbstrDockerCmd<CreateContainerCmd, C
     public CreateContainerCmd withPidMode(String pidMode) {
         checkNotNull(pidMode, "pidMode was not specified");
         this.hostConfig.setPidMode(pidMode);
+        return this;
+    }
+
+    @Override
+    public CreateContainerCmd withTmpfs(Map<String, String> tmpfs) {
+        checkNotNull(tmpfs, "tmpfs was not specified");
+        this.hostConfig.setTmpfs(tmpfs);
         return this;
     }
 

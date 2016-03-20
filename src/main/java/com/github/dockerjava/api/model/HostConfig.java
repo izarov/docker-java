@@ -1,5 +1,6 @@
 package com.github.dockerjava.api.model;
 
+import java.util.Map;
 import javax.annotation.CheckForNull;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -97,6 +98,9 @@ public class HostConfig {
 
     @JsonProperty("PidMode")
     private String pidMode;
+
+    @JsonProperty("Tmpfs")
+    private Map<String, String> tmpfs;
 
     @JsonIgnore
     public Bind[] getBinds() {
@@ -214,6 +218,11 @@ public class HostConfig {
         return pidMode;
     }
 
+    @CheckForNull
+    public Map<String, String> getTmpfs() {
+        return tmpfs;
+    }
+
     @JsonIgnore
     public void setBinds(Bind... binds) {
         this.binds = new Binds(binds);
@@ -327,6 +336,10 @@ public class HostConfig {
 
     public void setPidMode(String pidMode) {
         this.pidMode = pidMode;
+    }
+
+    public void setTmpfs(Map<String, String> tmpfs) {
+        this.tmpfs = tmpfs;
     }
 
     @Override
