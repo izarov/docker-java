@@ -54,8 +54,10 @@ import com.github.dockerjava.api.command.StopContainerCmd;
 import com.github.dockerjava.api.command.TagImageCmd;
 import com.github.dockerjava.api.command.TopContainerCmd;
 import com.github.dockerjava.api.command.UnpauseContainerCmd;
+import com.github.dockerjava.api.command.UpdateContainerCmd;
 import com.github.dockerjava.api.command.VersionCmd;
 import com.github.dockerjava.api.command.WaitContainerCmd;
+import com.github.dockerjava.api.command.RenameContainerCmd;
 import com.github.dockerjava.api.exception.DockerException;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.Identifier;
@@ -64,48 +66,48 @@ import com.github.dockerjava.core.RemoteApiVersion;
 // https://godoc.org/github.com/fsouza/go-dockerclient
 public interface DockerClient extends Closeable {
 
-    public AuthConfig authConfig() throws DockerException;
+    AuthConfig authConfig() throws DockerException;
 
     /**
      * Authenticate with the server, useful for checking authentication.
      */
-    public AuthCmd authCmd();
+    AuthCmd authCmd();
 
-    public InfoCmd infoCmd();
+    InfoCmd infoCmd();
 
-    public PingCmd pingCmd();
+    PingCmd pingCmd();
 
-    public VersionCmd versionCmd();
+    VersionCmd versionCmd();
 
     /**
      * * IMAGE API *
      */
 
-    public PullImageCmd pullImageCmd(@Nonnull String repository);
+    PullImageCmd pullImageCmd(@Nonnull String repository);
 
-    public PushImageCmd pushImageCmd(@Nonnull String name);
+    PushImageCmd pushImageCmd(@Nonnull String name);
 
-    public PushImageCmd pushImageCmd(@Nonnull Identifier identifier);
+    PushImageCmd pushImageCmd(@Nonnull Identifier identifier);
 
-    public CreateImageCmd createImageCmd(@Nonnull String repository, @Nonnull InputStream imageStream);
+    CreateImageCmd createImageCmd(@Nonnull String repository, @Nonnull InputStream imageStream);
 
-    public SearchImagesCmd searchImagesCmd(@Nonnull String term);
+    SearchImagesCmd searchImagesCmd(@Nonnull String term);
 
-    public RemoveImageCmd removeImageCmd(@Nonnull String imageId);
+    RemoveImageCmd removeImageCmd(@Nonnull String imageId);
 
-    public ListImagesCmd listImagesCmd();
+    ListImagesCmd listImagesCmd();
 
-    public InspectImageCmd inspectImageCmd(@Nonnull String imageId);
+    InspectImageCmd inspectImageCmd(@Nonnull String imageId);
 
-    public SaveImageCmd saveImageCmd(@Nonnull String name);
+    SaveImageCmd saveImageCmd(@Nonnull String name);
 
     /**
      * * CONTAINER API *
      */
 
-    public ListContainersCmd listContainersCmd();
+    ListContainersCmd listContainersCmd();
 
-    public CreateContainerCmd createContainerCmd(@Nonnull String image);
+    CreateContainerCmd createContainerCmd(@Nonnull String image);
 
     /**
      * Creates a new {@link StartContainerCmd} for the container with the given ID. The command can then be further customized by using
@@ -116,23 +118,23 @@ public interface DockerClient extends Closeable {
      * <p>
      * This command corresponds to the <code>/containers/{id}/start</code> endpoint of the Docker Remote API.
      */
-    public StartContainerCmd startContainerCmd(@Nonnull String containerId);
+    StartContainerCmd startContainerCmd(@Nonnull String containerId);
 
-    public ExecCreateCmd execCreateCmd(@Nonnull String containerId);
+    ExecCreateCmd execCreateCmd(@Nonnull String containerId);
 
-    public InspectContainerCmd inspectContainerCmd(@Nonnull String containerId);
+    InspectContainerCmd inspectContainerCmd(@Nonnull String containerId);
 
-    public RemoveContainerCmd removeContainerCmd(@Nonnull String containerId);
+    RemoveContainerCmd removeContainerCmd(@Nonnull String containerId);
 
-    public WaitContainerCmd waitContainerCmd(@Nonnull String containerId);
+    WaitContainerCmd waitContainerCmd(@Nonnull String containerId);
 
-    public AttachContainerCmd attachContainerCmd(@Nonnull String containerId);
+    AttachContainerCmd attachContainerCmd(@Nonnull String containerId);
 
-    public ExecStartCmd execStartCmd(@Nonnull String containerId);
+    ExecStartCmd execStartCmd(@Nonnull String execId);
 
-    public InspectExecCmd inspectExecCmd(@Nonnull String execId);
+    InspectExecCmd inspectExecCmd(@Nonnull String execId);
 
-    public LogContainerCmd logContainerCmd(@Nonnull String containerId);
+    LogContainerCmd logContainerCmd(@Nonnull String containerId);
 
     /**
      * Copy resource from container to local machine.
@@ -144,7 +146,7 @@ public interface DockerClient extends Closeable {
      * @return created command
      * @since {@link RemoteApiVersion#VERSION_1_20}
      */
-    public CopyArchiveFromContainerCmd copyArchiveFromContainerCmd(@Nonnull String containerId, @Nonnull String resource);
+    CopyArchiveFromContainerCmd copyArchiveFromContainerCmd(@Nonnull String containerId, @Nonnull String resource);
 
     /**
      * Copy resource from container to local machine.
@@ -158,7 +160,7 @@ public interface DockerClient extends Closeable {
      * @deprecated since docker API version 1.20, replaced by {@link #copyArchiveFromContainerCmd(String, String)}
      */
     @Deprecated
-    public CopyFileFromContainerCmd copyFileFromContainerCmd(@Nonnull String containerId, @Nonnull String resource);
+    CopyFileFromContainerCmd copyFileFromContainerCmd(@Nonnull String containerId, @Nonnull String resource);
 
     /**
      * Copy archive from local machine to remote container
@@ -168,59 +170,77 @@ public interface DockerClient extends Closeable {
      * @return created command
      * @since {@link RemoteApiVersion#VERSION_1_20}
      */
-    public CopyArchiveToContainerCmd copyArchiveToContainerCmd(@Nonnull String containerId);
+    CopyArchiveToContainerCmd copyArchiveToContainerCmd(@Nonnull String containerId);
 
-    public ContainerDiffCmd containerDiffCmd(@Nonnull String containerId);
+    ContainerDiffCmd containerDiffCmd(@Nonnull String containerId);
 
-    public ResizeContainerCmd resizeContainerCmd(String containerId, String height, String width);
+    ResizeContainerCmd resizeContainerCmd(String containerId, String height, String width);
 
-    public StopContainerCmd stopContainerCmd(@Nonnull String containerId);
+    StopContainerCmd stopContainerCmd(@Nonnull String containerId);
 
-    public KillContainerCmd killContainerCmd(@Nonnull String containerId);
+    KillContainerCmd killContainerCmd(@Nonnull String containerId);
 
-    public RestartContainerCmd restartContainerCmd(@Nonnull String containerId);
+    /**
+     * Update container settings
+     *
+     * @param containerId id of the container
+     * @return command
+     * @since {@link RemoteApiVersion#VERSION_1_22}
+     */
+    UpdateContainerCmd updateContainerCmd(@Nonnull String containerId);
 
-    public CommitCmd commitCmd(@Nonnull String containerId);
+    /**
+     * Rename container.
+     *
+     * @param containerId id of the container
+     * @return command
+     * @since {@link RemoteApiVersion#VERSION_1_17}
+     */
+    RenameContainerCmd renameContainerCmd(@Nonnull String containerId);
 
-    public BuildImageCmd buildImageCmd();
+    RestartContainerCmd restartContainerCmd(@Nonnull String containerId);
 
-    public BuildImageCmd buildImageCmd(File dockerFileOrFolder);
+    CommitCmd commitCmd(@Nonnull String containerId);
 
-    public BuildImageCmd buildImageCmd(InputStream tarInputStream);
+    BuildImageCmd buildImageCmd();
 
-    public TopContainerCmd topContainerCmd(String containerId);
+    BuildImageCmd buildImageCmd(File dockerFileOrFolder);
 
-    public TagImageCmd tagImageCmd(String imageId, String repository, String tag);
+    BuildImageCmd buildImageCmd(InputStream tarInputStream);
 
-    public PauseContainerCmd pauseContainerCmd(String containerId);
+    TopContainerCmd topContainerCmd(String containerId);
 
-    public UnpauseContainerCmd unpauseContainerCmd(String containerId);
+    TagImageCmd tagImageCmd(String imageId, String repository, String tag);
 
-    public EventsCmd eventsCmd();
+    PauseContainerCmd pauseContainerCmd(String containerId);
 
-    public StatsCmd statsCmd(String containerId);
+    UnpauseContainerCmd unpauseContainerCmd(String containerId);
 
-    public CreateVolumeCmd createVolumeCmd();
+    EventsCmd eventsCmd();
 
-    public InspectVolumeCmd inspectVolumeCmd(String name);
+    StatsCmd statsCmd(String containerId);
 
-    public RemoveVolumeCmd removeVolumeCmd(String name);
+    CreateVolumeCmd createVolumeCmd();
 
-    public ListVolumesCmd listVolumesCmd();
+    InspectVolumeCmd inspectVolumeCmd(String name);
 
-    public ListNetworksCmd listNetworksCmd();
+    RemoveVolumeCmd removeVolumeCmd(String name);
 
-    public InspectNetworkCmd inspectNetworkCmd();
+    ListVolumesCmd listVolumesCmd();
 
-    public CreateNetworkCmd createNetworkCmd();
+    ListNetworksCmd listNetworksCmd();
 
-    public RemoveNetworkCmd removeNetworkCmd(@Nonnull String networkId);
+    InspectNetworkCmd inspectNetworkCmd();
 
-    public ConnectToNetworkCmd connectToNetworkCmd();
+    CreateNetworkCmd createNetworkCmd();
 
-    public DisconnectFromNetworkCmd disconnectFromNetworkCmd();
+    RemoveNetworkCmd removeNetworkCmd(@Nonnull String networkId);
+
+    ConnectToNetworkCmd connectToNetworkCmd();
+
+    DisconnectFromNetworkCmd disconnectFromNetworkCmd();
 
     @Override
-    public void close() throws IOException;
+    void close() throws IOException;
 
 }

@@ -17,6 +17,7 @@ import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.client.WebTarget;
 
+import com.github.dockerjava.api.command.UpdateContainerCmd;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
@@ -80,6 +81,7 @@ import com.github.dockerjava.api.command.TopContainerCmd;
 import com.github.dockerjava.api.command.UnpauseContainerCmd;
 import com.github.dockerjava.api.command.VersionCmd;
 import com.github.dockerjava.api.command.WaitContainerCmd;
+import com.github.dockerjava.api.command.RenameContainerCmd;
 import com.github.dockerjava.api.exception.DockerClientException;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.LocalDirectorySSLConfig;
@@ -414,6 +416,17 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
     @Override
     public KillContainerCmd.Exec createKillContainerCmdExec() {
         return new KillContainerCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+
+    @Override
+    public UpdateContainerCmd.Exec createUpdateContainerCmdExec() {
+        return new UpdateContainerCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public RenameContainerCmd.Exec createRenameContainerCmdExec() {
+        return new RenameContainerCmdExec(getBaseResource(), getDockerClientConfig());
     }
 
     @Override

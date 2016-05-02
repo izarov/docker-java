@@ -37,7 +37,7 @@ public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, Bu
 
     private Invocation.Builder resourceWithOptionalAuthConfig(BuildImageCmd command, Invocation.Builder request) {
         final AuthConfigurations authConfigs = firstNonNull(command.getBuildAuthConfigs(), getBuildAuthConfigs());
-        if (authConfigs != null) {
+        if (authConfigs != null && !authConfigs.getConfigs().isEmpty()) {
             request = request.header("X-Registry-Config", registryConfigs(authConfigs));
         }
         return request;
@@ -108,13 +108,19 @@ public class BuildImageCmdExec extends AbstrAsyncDockerCmdExec<BuildImageCmd, Bu
             }
         }
 
+        if (command.getShmsize() != null) {
+            webTarget = webTarget.queryParam("shmsize", command.getShmsize());
+        }
+
         webTarget.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
         webTarget.property(ClientProperties.CHUNKED_ENCODING_SIZE, 1024 * 1024);
 
         LOGGER.trace("POST: {}", webTarget);
 
-        return new POSTCallbackNotifier<>(new JsonStreamProcessor<>(BuildResponseItem.class), resultCallback,
-                resourceWithOptionalAuthConfig(command, webTarget.request()).accept(MediaType.TEXT_PLAIN), entity(
-                        command.getTarInputStream(), "application/tar"));
+        return new POSTCallbackNotifier<>(new JsonStreamProcessor<>(BuildResponseItem.class),
+                resultCallback,
+                resourceWithOptionalAuthConfig(command, webTarget.request()).accept(MediaType.TEXT_PLAIN),
+                entity(command.getTarInputStream(), "application/tar")
+        );
     }
 }

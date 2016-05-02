@@ -48,8 +48,10 @@ import com.github.dockerjava.api.command.StopContainerCmd;
 import com.github.dockerjava.api.command.TagImageCmd;
 import com.github.dockerjava.api.command.TopContainerCmd;
 import com.github.dockerjava.api.command.UnpauseContainerCmd;
+import com.github.dockerjava.api.command.UpdateContainerCmd;
 import com.github.dockerjava.api.command.VersionCmd;
 import com.github.dockerjava.api.command.WaitContainerCmd;
+import com.github.dockerjava.api.command.RenameContainerCmd;
 import com.github.dockerjava.core.DockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.core.LocalDirectorySSLConfig;
@@ -100,16 +102,18 @@ import com.github.dockerjava.netty.exec.StopContainerCmdExec;
 import com.github.dockerjava.netty.exec.TagImageCmdExec;
 import com.github.dockerjava.netty.exec.TopContainerCmdExec;
 import com.github.dockerjava.netty.exec.UnpauseContainerCmdExec;
+import com.github.dockerjava.netty.exec.UpdateContainerCmdExec;
 import com.github.dockerjava.netty.exec.VersionCmdExec;
 import com.github.dockerjava.netty.exec.WaitContainerCmdExec;
+import com.github.dockerjava.netty.exec.RenameContainerCmdExec;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollDomainSocketChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DuplexChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.channel.unix.DomainSocketAddress;
@@ -117,6 +121,7 @@ import io.netty.channel.unix.UnixChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslHandler;
+import io.netty.util.concurrent.DefaultThreadFactory;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -146,6 +151,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
+    private static String threadPrefix = "dockerjava-netty";
+
     /*
      * useful links:
      *
@@ -167,8 +174,8 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
 
     private ChannelProvider channelProvider = new ChannelProvider() {
         @Override
-        public Channel getChannel() {
-            Channel channel = connect();
+        public DuplexChannel getChannel() {
+            DuplexChannel channel = connect();
             channel.pipeline().addLast(new LoggingHandler(getClass()));
             return channel;
         }
@@ -192,7 +199,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
         eventLoopGroup = nettyInitializer.init(bootstrap, dockerClientConfig);
     }
 
-    private Channel connect() {
+    private DuplexChannel connect() {
         try {
             return connect(bootstrap);
         } catch (InterruptedException e) {
@@ -200,20 +207,20 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
         }
     }
 
-    private Channel connect(final Bootstrap bootstrap) throws InterruptedException {
+    private DuplexChannel connect(final Bootstrap bootstrap) throws InterruptedException {
         return nettyInitializer.connect(bootstrap);
     }
 
     private interface NettyInitializer {
         EventLoopGroup init(final Bootstrap bootstrap, DockerClientConfig dockerClientConfig);
 
-        Channel connect(final Bootstrap bootstrap) throws InterruptedException;
+        DuplexChannel connect(final Bootstrap bootstrap) throws InterruptedException;
     }
 
     private class UnixDomainSocketInitializer implements NettyInitializer {
         @Override
         public EventLoopGroup init(Bootstrap bootstrap, DockerClientConfig dockerClientConfig) {
-            EventLoopGroup epollEventLoopGroup = new EpollEventLoopGroup();
+            EventLoopGroup epollEventLoopGroup = new EpollEventLoopGroup(0, new DefaultThreadFactory(threadPrefix));
             bootstrap.group(epollEventLoopGroup).channel(EpollDomainSocketChannel.class)
                     .handler(new ChannelInitializer<UnixChannel>() {
                         @Override
@@ -225,15 +232,15 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
         }
 
         @Override
-        public Channel connect(Bootstrap bootstrap) throws InterruptedException {
-            return bootstrap.connect(new DomainSocketAddress("/var/run/docker.sock")).sync().channel();
+        public DuplexChannel connect(Bootstrap bootstrap) throws InterruptedException {
+            return (DuplexChannel) bootstrap.connect(new DomainSocketAddress("/var/run/docker.sock")).sync().channel();
         }
     }
 
     private class InetSocketInitializer implements NettyInitializer {
         @Override
         public EventLoopGroup init(Bootstrap bootstrap, final DockerClientConfig dockerClientConfig) {
-            EventLoopGroup nioEventLoopGroup = new NioEventLoopGroup();
+            EventLoopGroup nioEventLoopGroup = new NioEventLoopGroup(0, new DefaultThreadFactory(threadPrefix));
 
             InetAddress addr = InetAddress.getLoopbackAddress();
 
@@ -255,7 +262,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
         }
 
         @Override
-        public Channel connect(Bootstrap bootstrap) throws InterruptedException {
+        public DuplexChannel connect(Bootstrap bootstrap) throws InterruptedException {
             String host = dockerClientConfig.getDockerHost().getHost();
             int port = dockerClientConfig.getDockerHost().getPort();
 
@@ -263,7 +270,7 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
                 throw new RuntimeException("no port configured for " + host);
             }
 
-            Channel channel = bootstrap.connect(host, port).sync().channel();
+            DuplexChannel channel = (DuplexChannel) bootstrap.connect(host, port).sync().channel();
 
             if (dockerClientConfig.getDockerTlsVerify()) {
                 final SslHandler ssl = initSsl(dockerClientConfig);
@@ -458,6 +465,16 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
     @Override
     public KillContainerCmd.Exec createKillContainerCmdExec() {
         return new KillContainerCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public UpdateContainerCmd.Exec createUpdateContainerCmdExec() {
+        return new UpdateContainerCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public RenameContainerCmd.Exec createRenameContainerCmdExec() {
+        return new RenameContainerCmdExec(getBaseResource(), getDockerClientConfig());
     }
 
     @Override

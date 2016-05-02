@@ -5,10 +5,34 @@ Change Log
 ---
 Notes
 
-* The upcoming release will contain multiple API breaking changes therefore the major version switch. It will support a subset of v.1.21 of the docker remote API. It also includes an experimental netty based implementation of `DockerCmdExecFactory` that probably will replace the current jersey/httpclient based one in a later release.
+* The upcoming release will contain multiple API breaking changes therefore the major version switch. It will support a subset of v.1.22 of the docker remote API. It also includes an experimental netty based implementation of `DockerCmdExecFactory` that probably will replace the current jersey/httpclient based one in a later release.
 * The configuration has been changed to better match the docker CLI configuration options. The properties file was renamed from `docker.io.properties` to `docker-java.properties`. See README.md for details.
 
 All changes
+
+Included in 3.0.0-RC5
+
+* [#542] (https://github.com/docker-java/docker-java/pull/542) Fix large volumes of output from "docker exec" trigger out of memory error
+* [#541] (https://github.com/docker-java/docker-java/pull/541) ImageInspectResponse.GraphDriver.Data is more complex structure 
+* [#534] (https://github.com/docker-java/docker-java/pull/534) Fix create volume command doesn't assign passed in volume driverOpts to field
+* [#533] (https://github.com/docker-java/docker-java/pull/533) Added shmsize build option 
+
+Included in 3.0.0-RC4
+* [#528] (https://github.com/docker-java/docker-java/pull/528) Fix DOCKER_TLS_VERIFY cannot be 'false' or empty
+* [#527] (https://github.com/docker-java/docker-java/pull/527) Fix `mirrors` field is list and not a single string #527 
+* [#510] (https://github.com/docker-java/docker-java/pull/510) Add CgroupParent option for create cmd
+* [#509] (https://github.com/docker-java/docker-java/pull/509) Implement container rename api 
+* [#501] (https://github.com/docker-java/docker-java/pull/501) Fix execution of copy file/archive command skips 0xFF bytes 
+* [#500] (https://github.com/docker-java/docker-java/pull/500) Add aux to ResponseItem
+* [#498] (https://github.com/docker-java/docker-java/issues/498) Update image inspect response
+
+
+Included in 3.0.0-RC3
+* [#488] (https://github.com/docker-java/docker-java/pull/488) Support remote API 1.22 subset
+
+Included in 3.0.0-RC2
+* [#486] (https://github.com/docker-java/docker-java/pull/486) Fix NegativeArraySizeException in awaitCompletion()
+* [#472] (https://github.com/docker-java/docker-java/pull/472) Exec start command: detect end of STDIN stream 
 * [#466] (https://github.com/docker-java/docker-java/pull/466) Fix exec start stdin encoding 
 
 Included in 3.0.0-RC1
@@ -30,6 +54,23 @@ Included in 3.0.0-RC1
 * [#357] (https://github.com/docker-java/docker-java/pull/357) Wait container command needs possibility to abort operation
 * [#347] (https://github.com/docker-java/docker-java/pull/347) Implementation of copy archive to/from container commands 
 * [#313] (https://github.com/docker-java/docker-java/pull/313) Refactor primitive type fields to be of object type in JSON objects
+
+v2.2.3
+---
+* [#487] (https://github.com/docker-java/docker-java/pull/487) Fix NegativeArraySizeException in awaitCompletion() 
+
+v2.2.2
+---
+* [#478] (https://github.com/docker-java/docker-java/pull/478) Remove debug println
+
+v2.2.1
+---
+* [#474] (https://github.com/docker-java/docker-java/pull/474) Fix periodic pull failure (2.x)
+
+v2.2.0
+---
+* [#457] (https://github.com/docker-java/docker-java/pull/457) Input configuration should not be altered as it breaks unix socket support 
+* [#430] (https://github.com/docker-java/docker-java/pull/430) Fix ExecStartCmd failure (backported from 3.0.0)
 
 v2.1.4
 ---

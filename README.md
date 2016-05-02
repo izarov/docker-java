@@ -4,8 +4,6 @@
 
 Java API client for [Docker](http://docs.docker.io/ "Docker")
 
-Supports a subset of the Docker Remote API [v1.19](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.19.md), Docker Server version 1.7.x
-
 <b>The current implementation is based on Jersey 2.x and therefore classpath incompatible with older Jersey 1.x dependent libraries!</b>
 
 Developer forum for [docker-java](https://groups.google.com/forum/?#!forum/docker-java-dev "docker-java")
@@ -16,7 +14,6 @@ Developer forum for [docker-java](https://groups.google.com/forum/?#!forum/docke
 
 * Java 1.7
 * Maven 3.0.5
-* Docker 1.7.x
 
 If you need SSL, then you'll need to put your `*.pem` file into `~/.docker/`, if you're using boot2docker, do this: 
  
@@ -36,9 +33,10 @@ listening on TCP port. To allow Docker server to use TCP add the following line 
 
     DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock"
 
-However you can force docker-java to use UNIX socket communication by configuring the following url:
+However you can force docker-java to use UNIX socket communication by configure the following (see [Configuration](.#Configuration) for details):
 
-    unix:///var/run/docker.sock
+    DOCKER_HOST=unix:///var/run/docker.sock
+    DOCKER_TLS_VERIFY=0
 
 More details about setting up Docker server can be found in official documentation: http://docs.docker.io/en/latest/use/basics/
 
@@ -60,22 +58,26 @@ Run build without integration tests:
 ## Docker-Java maven dependencies
 
 ### Latest release version
+Supports a subset of the Docker Remote API [v1.19](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.19.md), Docker Server version 1.7.x
 
     <dependency>
           <groupId>com.github.docker-java</groupId>
           <artifactId>docker-java</artifactId>
-          <version>2.2.0</version>
+          <version>2.2.3</version>
     </dependency>
     
 ### Latest release candidate
+Supports a subset of the Docker Remote API [v1.22](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.22.md), Docker Server version 1.10.x
 
     <dependency>
           <groupId>com.github.docker-java</groupId>
           <artifactId>docker-java</artifactId>
-          <version>3.0.0-RC1</version>
+          <version>3.0.0-RC5</version>
     </dependency>
     
 ### Latest development version
+Supports a subset of the Docker Remote API [v1.22](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.22.md), Docker Server version 1.10.x
+
 You can find the latest development version including javadoc and source files on [Sonatypes OSS repository](https://oss.sonatype.org/content/groups/public/com/github/docker-java/docker-java/).
 
     <dependency>
