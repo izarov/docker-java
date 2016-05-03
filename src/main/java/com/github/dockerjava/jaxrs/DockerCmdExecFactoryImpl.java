@@ -48,6 +48,7 @@ import com.github.dockerjava.api.command.DisconnectFromNetworkCmd;
 import com.github.dockerjava.api.command.DockerCmdExecFactory;
 import com.github.dockerjava.api.command.EventsCmd;
 import com.github.dockerjava.api.command.ExecCreateCmd;
+import com.github.dockerjava.api.command.ExecResizeCmd;
 import com.github.dockerjava.api.command.ExecStartCmd;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.api.command.InspectContainerCmd;
@@ -371,6 +372,11 @@ public class DockerCmdExecFactoryImpl implements DockerCmdExecFactory {
     @Override
     public AttachContainerCmd.Exec createAttachContainerCmdExec() {
         return new AttachContainerCmdExec(getBaseResource(), getDockerClientConfig());
+    }
+
+    @Override
+    public ExecResizeCmd.Exec createExecResizeCmdExec() {
+        return new ExecResizeCmdExec(getBaseResource(), getDockerClientConfig());
     }
 
     @Override

@@ -3,28 +3,28 @@ package com.github.dockerjava.core.command;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.dockerjava.api.exception.NotFoundException;
-import com.github.dockerjava.api.command.ResizeContainerCmd;
+import com.github.dockerjava.api.command.ExecResizeCmd;
 
 /**
  * Inspect the details of a container.
  */
-public class  ResizeContainerCmdImpl extends AbstrDockerCmd<ResizeContainerCmd, Void> implements
-        ResizeContainerCmd {
+public class  ExecResizeCmdImpl extends AbstrDockerCmd<ExecResizeCmd, Void> implements
+        ExecResizeCmd {
 
-    private String containerId;
+    private String execId;
     private String height;
     private String width;
 
-    public ResizeContainerCmdImpl(ResizeContainerCmd.Exec exec, String containerId, String height, String width) {
+    public ExecResizeCmdImpl(ExecResizeCmd.Exec exec, String execId, String height, String width) {
         super(exec);
-        withContainerId(containerId);
+        withExecId(execId);
         withHeight(height);
         withWidth(width);
     }
 
     @Override
-    public String getContainerId() {
-        return containerId;
+    public String getExecId() {
+        return execId;
     }
 
     @Override
@@ -38,20 +38,21 @@ public class  ResizeContainerCmdImpl extends AbstrDockerCmd<ResizeContainerCmd, 
     }
 
     @Override
-    public ResizeContainerCmd withContainerId(String containerId) {
-        this.containerId = containerId;
+    public ExecResizeCmd withExecId(String execId) {
+        checkNotNull(execId, "execId was not specified");
+        this.execId = execId;
         return this;
     }
 
     @Override
-    public ResizeContainerCmd withHeight(String height) {
+    public ExecResizeCmd withHeight(String height) {
         checkNotNull(height, "height was not specified");
         this.height = height;
         return this;
     }
 
     @Override
-    public ResizeContainerCmd withWidth(String width) {
+    public ExecResizeCmd withWidth(String width) {
         checkNotNull(width, "width was not specified");
         this.width = width;
         return this;

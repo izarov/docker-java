@@ -21,6 +21,7 @@ import com.github.dockerjava.api.command.CreateImageResponse;
 import com.github.dockerjava.api.command.DockerCmdExecFactory;
 import com.github.dockerjava.api.command.EventsCmd;
 import com.github.dockerjava.api.command.ExecCreateCmd;
+import com.github.dockerjava.api.command.ExecResizeCmd;
 import com.github.dockerjava.api.command.ExecStartCmd;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.api.command.InspectContainerCmd;
@@ -277,6 +278,11 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
     public ResizeContainerCmd.Exec createResizeContainerCmdExec() {
         return delegate.createResizeContainerCmdExec();
      }
+
+     @Override
+     public ExecResizeCmd.Exec createExecResizeCmdExec() {
+         return delegate.createExecResizeCmdExec();
+      }
 
     @Override
     public UpdateContainerCmd.Exec createUpdateContainerCmdExec() {

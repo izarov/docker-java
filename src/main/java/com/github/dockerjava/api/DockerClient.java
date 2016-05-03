@@ -23,6 +23,7 @@ import com.github.dockerjava.api.command.CreateVolumeCmd;
 import com.github.dockerjava.api.command.DisconnectFromNetworkCmd;
 import com.github.dockerjava.api.command.EventsCmd;
 import com.github.dockerjava.api.command.ExecCreateCmd;
+import com.github.dockerjava.api.command.ExecResizeCmd;
 import com.github.dockerjava.api.command.ExecStartCmd;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.api.command.InspectContainerCmd;
@@ -131,6 +132,8 @@ public interface DockerClient extends Closeable {
     AttachContainerCmd attachContainerCmd(@Nonnull String containerId);
 
     ExecStartCmd execStartCmd(@Nonnull String execId);
+
+    ExecResizeCmd execResizeCmd(String execId, String height, String width);
 
     InspectExecCmd inspectExecCmd(@Nonnull String execId);
 

@@ -25,6 +25,7 @@ import com.github.dockerjava.api.command.DisconnectFromNetworkCmd;
 import com.github.dockerjava.api.command.DockerCmdExecFactory;
 import com.github.dockerjava.api.command.EventsCmd;
 import com.github.dockerjava.api.command.ExecCreateCmd;
+import com.github.dockerjava.api.command.ExecResizeCmd;
 import com.github.dockerjava.api.command.ExecStartCmd;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.api.command.InspectContainerCmd;
@@ -78,6 +79,7 @@ import com.github.dockerjava.core.command.CreateVolumeCmdImpl;
 import com.github.dockerjava.core.command.DisconnectFromNetworkCmdImpl;
 import com.github.dockerjava.core.command.EventsCmdImpl;
 import com.github.dockerjava.core.command.ExecCreateCmdImpl;
+import com.github.dockerjava.core.command.ExecResizeCmdImpl;
 import com.github.dockerjava.core.command.ExecStartCmdImpl;
 import com.github.dockerjava.core.command.InfoCmdImpl;
 import com.github.dockerjava.core.command.InpectNetworkCmdImpl;
@@ -318,6 +320,11 @@ public class DockerClientImpl implements Closeable, DockerClient {
     @Override
     public AttachContainerCmd attachContainerCmd(String containerId) {
         return new AttachContainerCmdImpl(getDockerCmdExecFactory().createAttachContainerCmdExec(), containerId);
+    }
+
+    @Override
+    public ExecResizeCmd execResizeCmd(String execId, String height, String width) {
+        return new ExecResizeCmdImpl(getDockerCmdExecFactory().createExecResizeCmdExec(), execId, height, width);
     }
 
     @Override
