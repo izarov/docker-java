@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.google.common.base.Throwables;
 
+import com.github.dockerjava.api.exception.NotModifiedException;
+
 /**
  * Abstract template implementation of {@link ResultCallback}
  *
@@ -54,7 +56,9 @@ public abstract class ResultCallbackTemplate<RC_T extends ResultCallback<A_RES_T
         }
 
         try {
-            LOGGER.error("Error during callback", throwable);
+            if (!(throwable instanceof NotModifiedException)) {
+                LOGGER.error("Error during callback", throwable);
+            }
         } finally {
             try {
                 close();
