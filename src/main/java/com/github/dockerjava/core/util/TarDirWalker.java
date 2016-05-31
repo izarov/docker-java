@@ -26,14 +26,18 @@ public class TarDirWalker extends SimpleFileVisitor<Path> {
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         if (!dir.equals(basePath)) {
             tarArchiveOutputStream.putArchiveEntry(new TarArchiveEntry(FilePathUtil.relativize(basePath, dir)));
+            tarArchiveOutputStream.closeArchiveEntry();
         }
         return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        CompressArchiveUtil.putTarEntry(tarArchiveOutputStream,
-                new TarArchiveEntry(FilePathUtil.relativize(basePath, file)), file);
+        TarArchiveEntry tarEntry = new TarArchiveEntry(FilePathUtil.relativize(basePath, file));
+        if (file.toFile().canExecute()) {
+                tarEntry.setMode(tarEntry.getMode() | 0755);
+        }
+        CompressArchiveUtil.putTarEntry(tarArchiveOutputStream, tarEntry, file);
         return FileVisitResult.CONTINUE;
     }
 
