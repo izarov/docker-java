@@ -11,6 +11,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import javax.annotation.CheckForNull;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 public class HostConfig {
+
+    private static final List<String> PREDEFINED_NETWORKS = Arrays.asList("bridge", "host", "none");
 
     @JsonProperty("Binds")
     private Binds binds;
@@ -416,6 +419,15 @@ public class HostConfig {
     @CheckForNull
     public Map<String, String> getTmpfs() {
         return tmpfs;
+    }
+
+    /**
+     * Parse the network mode as specified at
+     * {@see https://github.com/docker/engine-api/blob/master/types/container/hostconfig_unix.go}
+     */
+    @JsonIgnore
+    public boolean isUserDefinedNetwork() {
+        return networkMode != null && !PREDEFINED_NETWORKS.contains(networkMode) && !networkMode.startsWith("container:");
     }
 
     @JsonIgnore

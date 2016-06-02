@@ -10,6 +10,7 @@ Notes
 
 All changes
 
+* [#585] (https://github.com/docker-java/docker-java/pull/585) Add RootDir property to GraphData
 * [#580] (https://github.com/docker-java/docker-java/pull/580) Fixes execute permissions for files when copied to container 
 * [#579] (https://github.com/docker-java/docker-java/pull/579) Adds missing name filter evaluation to netty version of ListImagesCmdExec 
 * [#578] (https://github.com/docker-java/docker-java/pull/578) Fix error during image build when Dockerfile in subdirectory of build context
@@ -17,7 +18,8 @@ All changes
 * [#574] (https://github.com/docker-java/docker-java/pull/574) Fix for copyArchiveToContainerCmd bug
 * [#572] (https://github.com/docker-java/docker-java/pull/572) Inspect container command now shows sizes if requested 
 * [#563] (https://github.com/docker-java/docker-java/pull/563) Fix memory leak in netty implementation of DockerCmdExecFactory
-* [#550] (https://github.com/docker-java/docker-java/pull/550) Add ability to configure IPAM config for CreateNetworkCmd 
+* [#550] (https://github.com/docker-java/docker-java/pull/550) Add ability to configure IPAM config for CreateNetworkCmd
+* [#484] (https://github.com/docker-java/docker-java/pull/484) Implement missing network api options for v1.22
 
 Included in 3.0.0-RC5
 
