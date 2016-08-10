@@ -23,6 +23,11 @@ public class RemoteApiVersion implements Serializable {
     private static final Pattern VERSION_REGEX = Pattern.compile("v?(\\d+)\\.(\\d+)");
 
     /**
+     * Online documentation is not available anymore.
+     */
+    public static final RemoteApiVersion VERSION_1_7 = RemoteApiVersion.create(1, 7);
+
+    /**
      * @see <a href="http://docs.docker.com/engine/reference/api/docker_remote_api_v1.16/">Docker API 1.16</a>
      */
     public static final RemoteApiVersion VERSION_1_16 = RemoteApiVersion.create(1, 16);
@@ -56,6 +61,16 @@ public class RemoteApiVersion implements Serializable {
      * @see <a href="https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.22.md">Docker API 1.22</a>
      */
     public static final RemoteApiVersion VERSION_1_22 = RemoteApiVersion.create(1, 22);
+
+    /**
+     * @see <a href="https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.23.md">Docker API 1.22</a>
+     */
+    public static final RemoteApiVersion VERSION_1_23 = RemoteApiVersion.create(1, 23);
+
+    /**
+     * @see <a href="https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.24.md">Docker API 1.22</a>
+     */
+    public static final RemoteApiVersion VERSION_1_24 = RemoteApiVersion.create(1, 24);
 
     /**
      * Unknown, docker doesn't reflect reality. I.e. we implemented method, but for javadoc it not clear when it was added.

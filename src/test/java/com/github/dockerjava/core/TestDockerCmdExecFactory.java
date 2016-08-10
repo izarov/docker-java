@@ -35,6 +35,7 @@ import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.api.command.ListImagesCmd;
 import com.github.dockerjava.api.command.ListNetworksCmd;
 import com.github.dockerjava.api.command.ListVolumesCmd;
+import com.github.dockerjava.api.command.LoadImageCmd;
 import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.command.PauseContainerCmd;
 import com.github.dockerjava.api.command.PingCmd;
@@ -59,7 +60,6 @@ import com.github.dockerjava.api.command.VersionCmd;
 import com.github.dockerjava.api.command.WaitContainerCmd;
 import com.github.dockerjava.api.model.BuildResponseItem;
 
-import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -129,6 +129,17 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
                 CreateImageResponse createImageResponse = delegate.createCreateImageCmdExec().exec(command);
                 imageNames.add(createImageResponse.getId());
                 return createImageResponse;
+            }
+        };
+    }
+
+    @Override
+    public LoadImageCmd.Exec createLoadImageCmdExec() {
+        return new LoadImageCmd.Exec() {
+            @Override
+            public Void exec(LoadImageCmd command) {
+                delegate.createLoadImageCmdExec().exec(command);
+                return null;
             }
         };
     }
@@ -441,10 +452,5 @@ public class TestDockerCmdExecFactory implements DockerCmdExecFactory {
 
     public List<String> getNetworkIds() {
         return new ArrayList<>(networkIds);
-    }
-
-    @Override
-    public DockerCmdExecFactory withSSLContext(SSLContext sslContext) {
-        return delegate.withSSLContext(sslContext);
     }
 }

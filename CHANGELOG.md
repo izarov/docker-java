@@ -1,15 +1,27 @@
 Change Log
 ===
 
-3.0.0-SNAPSHOT
+3.0.1-SNAPSHOT
+---
+
+All changes
+* Updated all dependencies
+* [#643] (https://github.com/docker-java/docker-java/pull/643) Fixes for .dockerignore filtering 
+* [#627] (https://github.com/docker-java/docker-java/pull/627) Implementation of POST /images/load endpoint 
+* [#630] (https://github.com/docker-java/docker-java/pull/630) Fix: Second execution of a docker command in Netty implementation always fails 
+* [#596] (https://github.com/docker-java/docker-java/pull/596) Refactor configuration of SSL to allow override with custom config 
+* [#529] (https://github.com/docker-java/docker-java/pull/529) Refactor CertUtils. Support ECDSA and PrivateKey 
+* [#593] (https://github.com/docker-java/docker-java/pull/593) Added Device.parse() method with simple verification.
+
+v3.0.0
 ---
 Notes
 
-* The upcoming release will contain multiple API breaking changes therefore the major version switch. It will support a subset of v.1.22 of the docker remote API. It also includes an experimental netty based implementation of `DockerCmdExecFactory` that probably will replace the current jersey/httpclient based one in a later release.
+* The 3.0.0 release contains multiple API breaking changes compared to 2.x therefore the major version switch. It supports a subset of v.1.22 of the docker remote API. It also includes an experimental netty based implementation of `DockerCmdExecFactory` that probably will replace the current jersey/httpclient based one in a later release. Take a look at the [Wiki](https://github.com/docker-java/docker-java/wiki#intialize-docker-client-advanced) how to use it.
 * The configuration has been changed to better match the docker CLI configuration options. The properties file was renamed from `docker.io.properties` to `docker-java.properties`. See README.md for details.
 
 All changes
-
+* [#590] (https://github.com/docker-java/docker-java/pull/590) Fix default docker.properties to match with docker CLI defaults 
 * [#585] (https://github.com/docker-java/docker-java/pull/585) Add RootDir property to GraphData
 * [#580] (https://github.com/docker-java/docker-java/pull/580) Fixes execute permissions for files when copied to container 
 * [#579] (https://github.com/docker-java/docker-java/pull/579) Adds missing name filter evaluation to netty version of ListImagesCmdExec 

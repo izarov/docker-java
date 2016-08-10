@@ -1,4 +1,11 @@
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.docker-java/docker-java.svg)]()
+[![Bintray](https://api.bintray.com/packages/kostyasha/maven/com.github.docker-java%3Adocker-java/images/download.svg)](https://bintray.com/kostyasha/maven/com.github.docker-java%3Adocker-java/_latestVersion) 
+[![Reference Status](https://www.versioneye.com/java/com.github.docker-java:docker-java/reference_badge.svg?style=flat)](https://www.versioneye.com/java/com.github.docker-java:docker-java/references)
 [![Build Status](https://travis-ci.org/docker-java/docker-java.svg?branch=master)](https://travis-ci.org/docker-java/docker-java)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/9177/badge.svg?flat=1)](https://scan.coverity.com/projects/9177)
+[![codecov.io](http://codecov.io/github/docker-java/docker-java/coverage.svg?branch=master)](http://codecov.io/github/docker-java/docker-java?branch=master)
+[![License](http://img.shields.io/:license-apache-blue.svg?style=flat)](https://github.com/docker-java/docker-java/blob/master/LICENSE)
+
 <!--[![Circle CI](https://circleci.com/gh/docker-java/docker-java.svg?style=svg)](https://circleci.com/gh/docker-java/docker-java)-->
 # docker-java 
 
@@ -8,16 +15,15 @@ Java API client for [Docker](http://docs.docker.io/ "Docker")
 
 Developer forum for [docker-java](https://groups.google.com/forum/?#!forum/docker-java-dev "docker-java")
 
+[Changelog](https://github.com/docker-java/docker-java/blob/master/CHANGELOG.md)<br/>
+[Wiki](https://github.com/docker-java/docker-java/wiki)
+
 ## Build with Maven
 
 ###### Prerequisites:
 
-* Java 1.7
-* Maven 3.0.5
-
-If you need SSL, then you'll need to put your `*.pem` file into `~/.docker/`, if you're using boot2docker, do this: 
- 
-    $ ln -s /Users/alex.collins/.boot2docker/certs/boot2docker-vm .docker
+* Java min 1.7
+* Maven 3
 
 Build and run integration tests as follows:
 
@@ -27,63 +33,41 @@ If you do not have access to a Docker server or just want to execute the build q
 
     $ mvn clean install -DskipITs
 
-By default Docker server is using UNIX sockets for communication with the Docker client, however docker-java
-client uses TCP/IP to connect to the Docker server by default, so you will need to make sure that your Docker server is
-listening on TCP port. To allow Docker server to use TCP add the following line to /etc/default/docker
+By default the docker engine is using local UNIX sockets for communication with the docker CLI so docker-java
+client also uses UNIX domain sockets to connect to the docker daemon by default. To make the docker daemon listening on a TCP (http/https) port you have to configure it by setting the DOCKER_OPTS environment variable to something like the following: 
 
     DOCKER_OPTS="-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock"
-
-However you can force docker-java to use UNIX socket communication by configure the following (see [Configuration](.#Configuration) for details):
-
-    DOCKER_HOST=unix:///var/run/docker.sock
-    DOCKER_TLS_VERIFY=0
-
+    
 More details about setting up Docker server can be found in official documentation: http://docs.docker.io/en/latest/use/basics/
 
-Now make sure that docker is up:
+To force docker-java to use TCP (http) configure the following (see [Configuration](https://github.com/docker-java/docker-java#configuration) for details):
 
-    $ docker -H tcp://127.0.0.1:2375 version
+    DOCKER_HOST=tcp://127.0.0.1:2375
+    
+For secure tls (https) communication:   
 
-    Client version: 0.8.0
-	Go version (client): go1.2
-	Git commit (client): cc3a8c8
-	Server version: 1.2.0
-	Git commit (server): fa7b24f
-	Go version (server): go1.3.1
-
-Run build without integration tests:
-
-    $ mvn clean install -DskipITs
-
-## Docker-Java maven dependencies
+    DOCKER_HOST=tcp://127.0.0.1:2376
+    DOCKER_TLS_VERIFY=1
+    DOCKER_CERT_PATH=/Users/marcus/.docker/machine/machines/docker-1.11.2
 
 ### Latest release version
-Supports a subset of the Docker Remote API [v1.19](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.19.md), Docker Server version 1.7.x
+Supports a subset of the Docker Remote API [v1.23](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.23.md), Docker Server version 1.11.x
 
     <dependency>
           <groupId>com.github.docker-java</groupId>
           <artifactId>docker-java</artifactId>
-          <version>2.2.3</version>
-    </dependency>
-    
-### Latest release candidate
-Supports a subset of the Docker Remote API [v1.22](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.22.md), Docker Server version 1.10.x
-
-    <dependency>
-          <groupId>com.github.docker-java</groupId>
-          <artifactId>docker-java</artifactId>
-          <version>3.0.0-RC5</version>
+          <version>3.0.1</version>
     </dependency>
     
 ### Latest development version
-Supports a subset of the Docker Remote API [v1.22](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.22.md), Docker Server version 1.10.x
+Supports a subset of the Docker Remote API [v1.23](https://github.com/docker/docker/blob/master/docs/reference/api/docker_remote_api_v1.23.md), Docker Server version 1.11.x
 
 You can find the latest development version including javadoc and source files on [Sonatypes OSS repository](https://oss.sonatype.org/content/groups/public/com/github/docker-java/docker-java/).
 
     <dependency>
           <groupId>com.github.docker-java</groupId>
           <artifactId>docker-java</artifactId>
-          <version>3.0.0-SNAPSHOT</version>
+          <version>3.0.2-SNAPSHOT</version>
     </dependency>
     
 
@@ -99,7 +83,7 @@ There are a couple of configuration items, all of which have sensible defaults:
 * `DOCKER_TLS_VERIFY` enable/disable TLS verification (switch between `http` and `https` protocol)
 * `DOCKER_CERT_PATH` Path to the certificates needed for TLS verification
 * `DOCKER_CONFIG` Path for additional docker configuration files (like `.dockercfg`)
-* `api.version` The API version, e.g. `1.21`.
+* `api.version` The API version, e.g. `1.23`.
 * `registry.url` Your registry's address.
 * `registry.username` Your registry username (required to push containers).
 * `registry.password` Your registry password.
@@ -110,12 +94,12 @@ There are three ways to configure, in descending order of precedence:
 #### Programmatic:
 In your application, e.g.
 
-    DockerClientConfig config = DockerClientConfig.createDefaultConfigBuilder()
+    DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
         .withDockerHost("tcp://my-docker-host.tld:2376")
         .withDockerTlsVerify(true)
         .withDockerCertPath("/home/user/.docker/certs")
         .withDockerConfig("/home/user/.docker")
-        .withApiVersion("1.21")
+        .withApiVersion("1.23")
         .withRegistryUrl("https://index.docker.io/v1/")
         .withRegistryUsername("dockeruser")
         .withRegistryPassword("ilovedocker")
@@ -129,7 +113,7 @@ In your application, e.g.
     DOCKER_TLS_VERIFY=1
     DOCKER_CERT_PATH=/home/user/.docker/certs
     DOCKER_CONFIG=/home/user/.docker
-    api.version=1.21
+    api.version=1.23
     registry.url=https://index.docker.io/v1/
     registry.username=dockeruser
     registry.password=ilovedocker
@@ -137,11 +121,11 @@ In your application, e.g.
 
 ##### System Properties:
 
-    java -Dregistry.username=dockeruser pkg.Main
+    java -DDOCKER_HOST=tcp://localhost:2375 -Dregistry.username=dockeruser pkg.Main
 
 ##### System Environment
 
-    export DOCKER_URL=tcp://localhost:2376
+    export DOCKER_HOST=tcp://localhost:2376
     export DOCKER_TLS_VERIFY=1
     export DOCKER_CERT_PATH=/home/user/.docker/certs
     export DOCKER_CONFIG=/home/user/.docker
