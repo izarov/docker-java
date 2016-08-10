@@ -23,7 +23,6 @@ import com.github.dockerjava.api.command.CreateVolumeCmd;
 import com.github.dockerjava.api.command.DisconnectFromNetworkCmd;
 import com.github.dockerjava.api.command.EventsCmd;
 import com.github.dockerjava.api.command.ExecCreateCmd;
-import com.github.dockerjava.api.command.ExecResizeCmd;
 import com.github.dockerjava.api.command.ExecStartCmd;
 import com.github.dockerjava.api.command.InfoCmd;
 import com.github.dockerjava.api.command.InspectContainerCmd;
@@ -44,7 +43,6 @@ import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.command.PushImageCmd;
 import com.github.dockerjava.api.command.RemoveContainerCmd;
 import com.github.dockerjava.api.command.RemoveImageCmd;
-import com.github.dockerjava.api.command.ResizeContainerCmd;
 import com.github.dockerjava.api.command.RemoveNetworkCmd;
 import com.github.dockerjava.api.command.RemoveVolumeCmd;
 import com.github.dockerjava.api.command.RestartContainerCmd;
@@ -146,8 +144,6 @@ public interface DockerClient extends Closeable {
 
     ExecStartCmd execStartCmd(@Nonnull String execId);
 
-    ExecResizeCmd execResizeCmd(String execId, String height, String width);
-
     InspectExecCmd inspectExecCmd(@Nonnull String execId);
 
     LogContainerCmd logContainerCmd(@Nonnull String containerId);
@@ -189,8 +185,6 @@ public interface DockerClient extends Closeable {
     CopyArchiveToContainerCmd copyArchiveToContainerCmd(@Nonnull String containerId);
 
     ContainerDiffCmd containerDiffCmd(@Nonnull String containerId);
-
-    ResizeContainerCmd resizeContainerCmd(String containerId, String height, String width);
 
     StopContainerCmd stopContainerCmd(@Nonnull String containerId);
 

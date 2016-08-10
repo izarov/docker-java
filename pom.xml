@@ -10,7 +10,6 @@
 	<groupId>com.github.docker-java</groupId>
 	<artifactId>docker-java</artifactId>
 	<packaging>jar</packaging>
-	<version>3.0.0-IZ-7</version>
 	<version>3.0.1-IZ</version>
 
 	<name>docker-java</name>
@@ -48,21 +47,13 @@
 		<jdk.source>1.7</jdk.source>
 		<jdk.target>1.7</jdk.target>
 
-<<<<<<< HEAD
-		<jersey.version>2.11</jersey.version>
-		<jackson-jaxrs.version>2.6.6</jackson-jaxrs.version>
-		<httpclient.version>4.3.1</httpclient.version>
-		<commons-compress.version>1.5</commons-compress.version>
-		<commons-codec.version>1.8</commons-codec.version>
-		<commons-io.version>2.3</commons-io.version>
-=======
 		<jersey.version>2.23.1</jersey.version>
 		<jackson-jaxrs.version>2.6.4</jackson-jaxrs.version>
 		<httpclient.version>4.5</httpclient.version><!-- 4.5.1-4.5.2 broken -->
 		<commons-compress.version>1.12</commons-compress.version>
 		<commons-codec.version>1.10</commons-codec.version>
 		<commons-io.version>2.5</commons-io.version>
->>>>>>> upstream/master
+
 		<commons-lang.version>2.6</commons-lang.version>
 		<slf4j-api.version>1.7.21</slf4j-api.version>
 
