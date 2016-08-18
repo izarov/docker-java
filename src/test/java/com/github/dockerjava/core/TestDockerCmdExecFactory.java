@@ -1,7 +1,6 @@
 package com.github.dockerjava.core;
 
 import com.github.dockerjava.api.async.ResultCallback;
-import com.github.dockerjava.api.command.*;
 import com.github.dockerjava.api.command.AttachContainerCmd;
 import com.github.dockerjava.api.command.AuthCmd.Exec;
 import com.github.dockerjava.api.command.BuildImageCmd;

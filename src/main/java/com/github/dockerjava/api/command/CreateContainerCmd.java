@@ -197,9 +197,6 @@ public interface CreateContainerCmd extends SyncDockerCmd<CreateContainerRespons
     @CheckForNull
     Boolean isTty();
 
-    @CheckForNull
-    Map<String, String> getTmpfs();
-
     /**
      * Add network-scoped alias for the container
      * @param aliases on ore more aliases
