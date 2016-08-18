@@ -1,8 +1,22 @@
 Change Log
 ===
+## Next
 
-3.0.1-SNAPSHOT
----
+## 3.0.5
+ * Events updated to 1.24 API model.
+
+## 3.0.4
+ * Make cert util methods public.
+
+## 3.0.3
+ * [JERSEY] Don't send body for start container request.
+
+## 3.0.2
+ * Enhanced Dockerignore filtering.
+ * Added shmsize for hostconfig.
+ * Exposed HostConfig instead of spaghetty calls.
+
+## 3.0.1
 
 All changes
 * Updated all dependencies

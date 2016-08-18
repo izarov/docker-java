@@ -6,6 +6,7 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Capability;
 import com.github.dockerjava.api.model.Device;
 import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Link;
 import com.github.dockerjava.api.model.LogConfig;
 import com.github.dockerjava.api.model.LxcConf;
@@ -186,6 +187,9 @@ public interface CreateContainerCmd extends SyncDockerCmd<CreateContainerRespons
 
     @CheckForNull
     String getPidMode();
+
+    @CheckForNull
+    HostConfig getHostConfig();
 
     @CheckForNull
     String getCgroupParent();
@@ -439,7 +443,7 @@ public interface CreateContainerCmd extends SyncDockerCmd<CreateContainerRespons
      */
     CreateContainerCmd withPidMode(String pidMode);
 
-    CreateContainerCmd withTmpfs(Map<String, String> tmpfs);
+    CreateContainerCmd withHostConfig(HostConfig hostConfig);
 
     /**
      * @throws NotFoundException

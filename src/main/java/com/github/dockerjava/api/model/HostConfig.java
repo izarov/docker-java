@@ -194,7 +194,7 @@ public class HostConfig {
      * @since {@link RemoteApiVersion#VERSION_1_22}
      */
     @JsonProperty("ShmSize")
-    private String shmSize;
+    private Long shmSize;
 
     @JsonIgnore
     public Bind[] getBinds() {
@@ -404,7 +404,7 @@ public class HostConfig {
      * @see #shmSize
      */
     @CheckForNull
-    public String getShmSize() {
+    public Long getShmSize() {
         return shmSize;
     }
 
@@ -772,7 +772,7 @@ public class HostConfig {
     /**
      * @see #shmSize
      */
-    public HostConfig withShmSize(String shmSize) {
+    public HostConfig withShmSize(Long shmSize) {
         this.shmSize = shmSize;
         return this;
     }

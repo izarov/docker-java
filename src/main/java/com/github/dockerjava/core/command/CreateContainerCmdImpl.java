@@ -473,9 +473,8 @@ public class CreateContainerCmdImpl extends AbstrDockerCmd<CreateContainerCmd, C
     }
 
     @Override
-    @JsonIgnore
-    public Map<String, String> getTmpfs() {
-        return hostConfig.getTmpfs();
+    public HostConfig getHostConfig() {
+        return hostConfig;
     }
 
     @Override
@@ -983,12 +982,12 @@ public class CreateContainerCmdImpl extends AbstrDockerCmd<CreateContainerCmd, C
     }
 
     @Override
-    public CreateContainerCmd withTmpfs(Map<String, String> tmpfs) {
-        checkNotNull(tmpfs, "tmpfs was not specified");
-        this.hostConfig.setTmpfs(tmpfs);
+    public CreateContainerCmd withHostConfig(HostConfig hostConfig) {
+        this.hostConfig = hostConfig;
         return this;
     }
 
+    @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
